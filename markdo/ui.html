@@ -19,26 +19,12 @@
 <script src="/static/jquery-ui/js/jquery-ui-1.8.22.custom.min.js"></script>
 <script src="/static/marked.js"></script>
 <script>
-var updateQ = [];
-setInterval(function(){
-    if (updateQ.length < 1){
-        return;
-    };
-    while (updateQ.length > 1){
-        updateQ.pop();
-    };
-    event = updateQ.pop();
-    text = $(event.target).val();
-    html = marked(text);
-    $('#result').html(html);
-}, 200)
 $(document).ready(function(){
     $('#editor').keyup(function(event){
-        updateQ.push(event);
+        text = $(event.target).val();
+        html = marked(text);
+        $('#result').html(html);
     });
-
-    $('#editor').trigger('keyup');
-
     $('#save').click(function(){
         $.get('/save/');
     });
@@ -46,9 +32,10 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
-<div class="container">
+<div class="container-fluid">
     <div class="row-fluid">
         <div class="span6">
+            <input id="file" type="text" style="width: 100%;height: 30px; display: none; margin-top: 20px;">
             <div class="btn-toolbar">
                 <div class="btn-group">
                     <button class="btn"><img src="/static/icon/faenza/actions/24/format-text-bold.png"><br>Bold</button>
@@ -57,14 +44,13 @@ $(document).ready(function(){
                     <button class="btn"><img src="/static/icon/faenza/actions/24/insert-link.png"><br>Link</button>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-primary"><img src="/static/icon/faenza/actions/24/document-save.png"><br>Open</button>
                     <button id="save" class="btn btn-primary"><img src="/static/icon/faenza/actions/24/document-save.png"><br>Save</button>
                 </div>
             </div>
             <textarea id="editor" style="width: 100%; min-height: 300px;"></textarea>
         </div>
         <div class="span6">
-            <div id="result" style="width: 100%;"></div>
+            <div id="result" style="width: 100%; margin-top: 20px;"></div>
         </div>
     </div>
 </div>
