@@ -51,8 +51,6 @@ def on_notify_load_status(webkitView, *args, **kwargs):
         if app.file_name != None:
             input_file = app.document.get_element_by_id('file')
             input_file.set_value(app.file_name)
-            css = input_file.get_style()
-            css.remove_property('display')
             md = open(app.file_name, 'r').read()
             app.document.get_element_by_id('editor').set_value(md)
             webkitView.execute_script('$("#editor").trigger("keyup");')
