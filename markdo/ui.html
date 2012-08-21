@@ -3,31 +3,49 @@
 <head>
 <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" />
 <link rel="stylesheet" href="/static/bootstrap/css/bootstrap-responsive.min.css" />
+<link rel="stylesheet" href="/static/codemirror/lib/codemirror.css" />
 <style type="text/css">
-#result p{
-    font-size: 1.2em;
-}
-#result sup{
-    font-size: 1.0em;
-}
-#editor {
+#result {
     font-size: 1.2em;
     line-height: 1.8em;
+}
+#result p{
+    margin-top: 1.1em;
+}
+.CodeMirror {
+    border: 1px solid #aaa;
+    font-size: 1.1em;
+    line-height: 1.5em;
+}
+.CodeMirror-scroll {
+    height: auto;
+    min-height: 400px;
+    overflow-y: hidden;
+    overflow-x: auto;
 }
 </style>
 <script src="/static/jquery-ui/js/jquery-1.7.2.min.js"></script>
 <script src="/static/jquery-ui/js/jquery-ui-1.8.22.custom.min.js"></script>
 <script src="/static/marked.js"></script>
+<script src="/static/codemirror/lib/codemirror.js"></script>
+<script src="/static/codemirror/mode/markdown/markdown.js"></script>
 <script>
 $(document).ready(function(){
-    $('#editor').keyup(function(event){
-        text = $(event.target).val();
-        html = marked(text);
-        $('#result').html(html);
-    });
     $('#save').click(function(){
         $.get('/save/');
     });
+    var codeMirror = CodeMirror.fromTextArea(
+        $('#editor').get(0),
+        {
+            onChange: function(){
+                var html = marked(codeMirror.getValue());
+                $('#result').html(html);
+            },
+            indentUnit: 4,
+            smartIndent: true,
+            lineNumbers: true
+        }
+    );
 });
 </script>
 </head>
