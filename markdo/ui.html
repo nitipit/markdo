@@ -2,9 +2,10 @@
 <html>
 <head>
 <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/static/base.css" />
 <link rel="stylesheet" href="/static/bootstrap/css/bootstrap-responsive.min.css" />
 <link rel="stylesheet" href="/static/codemirror/lib/codemirror.css" />
-<style type="text/css">
+<style>
 #result {
     font-size: 1.2em;
     line-height: 1.8em;
@@ -26,15 +27,17 @@
 </style>
 <script src="/static/jquery-ui/js/jquery-1.7.2.min.js"></script>
 <script src="/static/jquery-ui/js/jquery-ui-1.8.22.custom.min.js"></script>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
 <script src="/static/marked.js"></script>
 <script src="/static/codemirror/lib/codemirror.js"></script>
 <script src="/static/codemirror/mode/markdown/markdown.js"></script>
 <script>
+var codeMirror ;
 $(document).ready(function(){
     $('#save').click(function(){
         $.get('/save/');
     });
-    var codeMirror = CodeMirror.fromTextArea(
+    codeMirror = CodeMirror.fromTextArea(
         $('#editor').get(0),
         {
             onChange: function(){
@@ -43,22 +46,33 @@ $(document).ready(function(){
             },
             indentUnit: 4,
             smartIndent: true,
+            lineWrapping: true,
             lineNumbers: true
         }
     );
+
 });
 </script>
 </head>
 <body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <ul class="nav">
+                <li><button id="edit-button" class="btn btn-success" data-toggle="button"><i class="icon-edit"></i></button></li>
+            </ul>
+        </div>
+    </div>
+</div>
 <div class="container-fluid">
     <div class="row-fluid">
-        <div class="span6">
-            <input id="file" type="text" style="width: 80%;height: 40px; margin-top: 10px; font-size: 1.2em;" placeholder="Input file name here">
+        <div id="editor-section" class="span6">
+            <input id="file" type="text" style="width: 250px;height: 40px; margin-top: 10px; font-size: 1.2em;" placeholder="Input file name here">
             <button id="save" class="btn btn-primary"><img src="/static/icon/faenza/actions/24/document-save.png"><br>Save</button>
-            <textarea id="editor" style="width: 100%; min-height: 300px;"></textarea>
+            <textarea id="editor" style="width: 100%;"></textarea>
         </div>
         <div class="span6">
-            <div id="result" style="width: 100%; margin-top: 20px;"></div>
+            <div id="result"></div>
         </div>
     </div>
 </div>

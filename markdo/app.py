@@ -32,6 +32,7 @@ def init():
     webkitView = WebKit.WebView()
     settings = webkitView.get_settings()
     settings.set_property('enable-universal-access-from-file-uris', True)
+    settings.set_property('enable-developer-extras', True)
     window.set_size_request(800,600)
     scrollWindow = Gtk.ScrolledWindow()
     scrollWindow.add(webkitView)
@@ -53,7 +54,7 @@ def on_notify_load_status(webkitView, *args, **kwargs):
             input_file.set_value(app.file_name)
             md = open(app.file_name, 'r').read()
             app.document.get_element_by_id('editor').set_value(md)
-            webkitView.execute_script('$("#editor").trigger("keyup");')
+            webkitView.execute_script('codeMirror.setValue($("#editor").val())')
 
 def on_resource_request_starting(webkitView, *args, **kwargs):
     web_resource = args[1]
