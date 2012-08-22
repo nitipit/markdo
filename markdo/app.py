@@ -33,7 +33,7 @@ def init():
     settings = webkitView.get_settings()
     settings.set_property('enable-universal-access-from-file-uris', True)
     settings.set_property('enable-developer-extras', True)
-    window.set_size_request(800,600)
+    window.set_default_size(800,600)
     scrollWindow = Gtk.ScrolledWindow()
     scrollWindow.add(webkitView)
     window.add(scrollWindow)
