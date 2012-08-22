@@ -84,6 +84,7 @@ def run():
 @app.route('/save/')
 def save(webkitView, web_resource, request):
     file_name = app.document.get_element_by_id('file').get_value()
+    webkitView.execute_script('$("#editor").val(codeMirror.getValue())')
     md = app.document.get_element_by_id('editor').get_value()
     f = open(file_name, 'w')
     f.write(md)
