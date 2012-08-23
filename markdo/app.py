@@ -8,8 +8,11 @@ import re
 Gtk.init('')
 
 class App(object):
-    registed_route = {}
-    document = None
+    """App
+    Application class
+    """
+    registed_route = {} # for url to function mapping
+    document = None # Root DOM
     try:
         file_name = sys.argv[1]
     except:
@@ -46,9 +49,15 @@ def init():
     return (window, webkitView)
 
 def on_notify_load_status(webkitView, *args, **kwargs):
+    """Callback function when the page was loaded completely
+
+    FYI, this function will be called after $(document).ready()
+    in jQuery
+    """
     status = webkitView.get_load_status()
     if status == status.FINISHED:
         app.document = webkitView.get_dom_document()
+        # load file content into editor
         if app.file_name != None:
             input_file = app.document.get_element_by_id('file')
             input_file.set_value(app.file_name)
@@ -57,9 +66,17 @@ def on_notify_load_status(webkitView, *args, **kwargs):
             webkitView.execute_script('codeMirror.setValue($("#editor").val())')
 
 def on_resource_request_starting(webkitView, *args, **kwargs):
+    """Call back function to handle urls start with '/'
+
+    Handle webkit request for local resources
+    """
+
     web_resource = args[1]
     request = args[2]
     url = urlparse(request.get_uri())
+
+    # return file uri if request for /static/
+    # else, route to registed function
     if re.match('^/static/', url.path):
         url = url.path[1:]
         url = 'file://' + os.path.join(app.base_path, url)
@@ -83,6 +100,8 @@ def run():
 
 @app.route('/save/')
 def save(webkitView, web_resource, request):
+    """save markdown content to the file"""
+
     file_name = app.document.get_element_by_id('file').get_value()
     webkitView.execute_script('$("#editor").val(codeMirror.getValue())')
     md = app.document.get_element_by_id('editor').get_value()
