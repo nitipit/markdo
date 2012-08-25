@@ -1,7 +1,7 @@
 # MarkDo - Markdown editor for Gnome
 ---
 ## Screenshot
-![screenshot](https://raw.github.com/nitipit/markdo/master/doc/screenshot.png)
+![Screenshot](https://raw.github.com/nitipit/markdo/master/doc/fedora-screenshot.png)
 
 ## Installation
 Run command below in your bash shell (#)
