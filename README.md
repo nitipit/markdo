@@ -6,10 +6,13 @@
 ## Installation
 Run command below in your bash shell (#)
 ```
-git clone https://github.com/nitipit/markdo.git
-cd markdo
-python setup.py install
+pip install markdo
 ```
+or
+```
+easy_install markdo
+```
+
 ## Usage
 ```
 $ markdo README.md
