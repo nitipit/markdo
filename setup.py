@@ -13,6 +13,13 @@ for d in os.walk('markdo/'):
 setup(
     name="MarkDo",
     version="0.1",
+    author="Nitipit Nontasuwan",
+    author_email="nitipit@gmail.com",
+    url="http://nitipit.github.com/markdo/",
+    license="MIT",
+    description="Markdown editor for Gnome",
+    platforms=['linux'],
+    keywords=['editor', 'markdown'],
     package_dir={'markdo': 'markdo'},
     packages=['markdo'],
     scripts=['markdo/markdo'],
