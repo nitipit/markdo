@@ -21,7 +21,6 @@ app.file_name = file_name
 @app.route('/$')
 def index():
     ui_path = os.path.join(app.app_path, 'ui.html')
-    print ui_path
     template = Template(open(ui_path).read())
     markdown = None
     if app.file_name is not None:

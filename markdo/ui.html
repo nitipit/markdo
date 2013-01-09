@@ -66,9 +66,9 @@ $(document).ready(function(){
 <div class="container-fluid">
     <div class="row-fluid">
         <div id="editor-section" class="span6">
-            <input id="file" type="text" style="width: 250px;height: 40px; margin-top: 10px; font-size: 1.2em;" placeholder="Input file name here" value="{{file_name}}">
+            <input id="file" type="text" style="width: 250px;height: 40px; margin-top: 10px; font-size: 1.2em;" placeholder="Input file name here" {% if file_name != None %}value="{{file_name}}"{% endif %}>
             <button id="save" class="btn btn-primary"><img src="/static/icon/faenza/actions/24/document-save.png"><br>Save</button>
-            <textarea id="editor" style="width: 100%;">{{text}}</textarea>
+            <textarea id="editor" style="width: 100%;">{{text or ''}}</textarea>
         </div>
         <div class="span6">
             <div id="result"></div>
