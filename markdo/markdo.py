@@ -5,10 +5,13 @@ import os
 import sys
 from jinja2 import Template
 
+
 app = App(app_path=os.path.dirname(__file__))
 
 try:
     file_name = sys.argv[1]
+    if not os.path.exists(file_name):
+        open(file_name, 'w').close()
 except:
     file_name = None
 
