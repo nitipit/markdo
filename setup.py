@@ -24,5 +24,5 @@ setup(
     packages=['markdo'],
     scripts=['markdo/markdo'],
     package_data={'markdo': data},
-    install_requires=['appkit==0.2'],
+    install_requires=['AppKit==0.2', 'Jinja2'],
 )
