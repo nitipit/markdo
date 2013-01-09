@@ -1,4 +1,4 @@
-from setuptools import setup
+from distutils.core import setup
 import os
 
 data = list()
@@ -24,5 +24,5 @@ setup(
     packages=['markdo'],
     scripts=['markdo/markdo'],
     package_data={'markdo': data},
-    install_requires=['AppKit==0.2', 'Jinja2'],
+    requires=['AppKit(>=0.2)', 'Jinja2'],
 )
