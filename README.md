@@ -1,5 +1,8 @@
 # MarkDo - Markdown editor for Gnome
 ---
+## Changes in version 0.2
+- Markdo now based on [AppKit](http://nitipit.github.com/appkit/) 0.2
+
 ## Screenshot
 ![Screenshot](https://raw.github.com/nitipit/markdo/master/doc/fedora-screenshot.png)
 
