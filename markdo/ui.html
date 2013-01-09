@@ -38,7 +38,11 @@
 var codeMirror ;
 $(document).ready(function(){
     $('#save').click(function(){
-        $.get('/save/');
+        var d = new Date();
+        $('#editor').val(codeMirror.getValue());
+        // Trigger /save/ controller with time parameters
+        // to prevent webkit ajax will get data from cache
+        $.get('/save/?time='+d.getTime());
     });
     codeMirror = CodeMirror.fromTextArea(
         $('#editor').get(0),
@@ -54,6 +58,7 @@ $(document).ready(function(){
         }
     );
 
+    codeMirror.setValue($('#editor').val());
 });
 </script>
 </head>
@@ -61,9 +66,9 @@ $(document).ready(function(){
 <div class="container-fluid">
     <div class="row-fluid">
         <div id="editor-section" class="span6">
-            <input id="file" type="text" style="width: 250px;height: 40px; margin-top: 10px; font-size: 1.2em;" placeholder="Input file name here">
+            <input id="file" type="text" style="width: 250px;height: 40px; margin-top: 10px; font-size: 1.2em;" placeholder="Input file name here" value="{{file_name}}">
             <button id="save" class="btn btn-primary"><img src="/static/icon/faenza/actions/24/document-save.png"><br>Save</button>
-            <textarea id="editor" style="width: 100%;"></textarea>
+            <textarea id="editor" style="width: 100%;">{{text}}</textarea>
         </div>
         <div class="span6">
             <div id="result"></div>

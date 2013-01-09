@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 import os
 
 data = list()
@@ -12,7 +12,7 @@ for d in os.walk('markdo/'):
 
 setup(
     name="MarkDo",
-    version="0.1",
+    version="0.2",
     author="Nitipit Nontasuwan",
     author_email="nitipit@gmail.com",
     url="http://nitipit.github.com/markdo/",
@@ -24,5 +24,5 @@ setup(
     packages=['markdo'],
     scripts=['markdo/markdo'],
     package_data={'markdo': data},
-    requires=['appkit', ],
+    install_requires=['appkit>=0.2'],
 )
