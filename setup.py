@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 import os
 
 data = list()
@@ -13,6 +13,7 @@ for d in os.walk('markdo/'):
         data.extend(path_list)
 
 setup(
+    # Metadata
     name="MarkDo",
     version="0.2",
     author="Nitipit Nontasuwan",
@@ -22,9 +23,11 @@ setup(
     description="Markdown editor for Gnome",
     platforms=['linux'],
     keywords=['editor', 'markdown'],
+
+    # Setup config
+    packages=find_packages(),
     package_dir={'markdo': 'markdo'},
-    packages=['markdo'],
-    scripts=['markdo/markdo'],
     package_data={'markdo': data},
-    requires=['AppKit(==0.2)', 'Jinja2'],
+    scripts=['markdo/markdo'],
+    install_requires=['distribute', 'appkit==0.2', 'Jinja2']
 )
