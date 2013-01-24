@@ -4,9 +4,10 @@ from appkit import App
 import os
 import sys
 from jinja2 import Template
+import codecs
 
 
-app = App(app_path=os.path.dirname(__file__))
+app = App(__file__)
 
 try:
     file_name = sys.argv[1]
@@ -24,7 +25,7 @@ def index():
     template = Template(open(ui_path).read())
     markdown = None
     if app.file_name is not None:
-        markdown = open(file_name).read()
+        markdown = codecs.open(file_name, 'r', 'utf-8').read()
     return template.render(file_name=app.file_name, text=markdown)
 
 
