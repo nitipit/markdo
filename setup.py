@@ -15,7 +15,7 @@ for d in os.walk('markdo/'):
 setup(
     # Metadata
     name="MarkDo",
-    version="0.2.1",
+    version="0.2.2",
     author="Nitipit Nontasuwan",
     author_email="nitipit@gmail.com",
     url="http://nitipit.github.com/markdo/",
@@ -29,5 +29,5 @@ setup(
     package_dir={'markdo': 'markdo'},
     package_data={'markdo': data},
     scripts=['markdo/markdo'],
-    install_requires=['appkit==0.2.1', 'Jinja2']
+    install_requires=['appkit==0.2.4', 'Jinja2']
 )

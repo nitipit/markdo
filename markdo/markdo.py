@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from appkit import App
+from appkit.api.v0_2_4 import App
 import os
 import sys
 from jinja2 import Template
@@ -21,7 +21,7 @@ app.file_name = file_name
 
 @app.route('/$')
 def index():
-    ui_path = os.path.join(app.app_path, 'ui.html')
+    ui_path = os.path.join(app.app_dir, 'ui.html')
     template = Template(open(ui_path).read())
     markdown = None
     if app.file_name is not None:
