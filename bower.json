@@ -1,0 +1,24 @@
+{
+  "name": "markdo",
+  "version": "0.2.4",
+  "homepage": "https://github.com/nitipit/markdo",
+  "authors": [
+    "Um Nontasuwan <nitipit@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "codemirror": "https://github.com/marijnh/CodeMirror.git#v2.38",
+    "foundation": "http://foundation.zurb.com/cdn/releases/foundation-5.0.3.zip",
+    "marked": "https://github.com/chjj/marked.git#~0.3.0",
+    "jquery": "~2.1.0",
+    "font-awesome": "~4.0.3"
+  }
+}

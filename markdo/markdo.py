@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-from appkit.api.v0_2_4 import App
+from appkit.api.v0_2_6 import App
+from flask import render_template, request
 import os
 import sys
-from jinja2 import Template
 import codecs
 
-
-app = App(__file__)
+app = App(__name__)
 
 try:
     file_name = sys.argv[1]
@@ -19,25 +18,23 @@ except:
 app.file_name = file_name
 
 
-@app.route('/$')
+@app.route('/')
 def index():
-    ui_path = os.path.join(app.app_dir, 'ui.html')
-    template = Template(open(ui_path).read())
     markdown = None
     if app.file_name is not None:
         markdown = codecs.open(file_name, 'r', 'utf-8').read()
-    return template.render(file_name=app.file_name, text=markdown)
+    return render_template('/ui.html', text=markdown)
 
 
-@app.route('/save/')
+@app.route('/save/', methods=['POST',])
 def save():
     """save markdown content to the file"""
+    
+    file_name = request.form.get('file', None)
+    text = request.form.get('text', None)
 
-    document = app.webkit_web_view.get_dom_document()
-    file_name = document.get_element_by_id('file').get_value()
-    md = document.get_element_by_id('editor').get_value()
     f = open(file_name, 'w')
-    f.write(md)
+    f.write(text)
     f.close()
     return 'Saved'
 

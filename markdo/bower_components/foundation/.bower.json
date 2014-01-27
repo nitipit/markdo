@@ -1,0 +1,13 @@
+{
+  "name": "foundation-5.0.3",
+  "_cacheHeaders": {
+    "ETag": "\"52dec6ff-1ff34\"",
+    "Last-Modified": "Tue, 21 Jan 2014 19:14:07 GMT",
+    "Content-Length": "130868",
+    "Content-Type": "application/zip"
+  },
+  "_release": "e-tag:52dec6ff-",
+  "_source": "http://foundation.zurb.com/cdn/releases/foundation-5.0.3.zip",
+  "_target": "*",
+  "_originalSource": "http://foundation.zurb.com/cdn/releases/foundation-5.0.3.zip"
+}
