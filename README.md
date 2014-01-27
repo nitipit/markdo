@@ -28,8 +28,3 @@ easy_install markdo
 ```
 $ markdo README.md
 ```
-## Libraries used
-- [Bootstrap](http://twitter.github.com/bootstrap/) from Twitter
-- [CodeMirror](http://codemirror.net/)
-- [Marked](https://github.com/chjj/marked/)
-- [Faenza Icon](http://tiheum.deviantart.com/art/Faenza-Icons-173323228)
