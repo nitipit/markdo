@@ -2,6 +2,7 @@
 
 from distutils.core import setup
 import os
+from markdo import __version__
 
 data = list()
 for d in os.walk('markdo/'):
@@ -15,13 +16,13 @@ for d in os.walk('markdo/'):
 setup(
     # Metadata
     name="MarkDo",
-    version="0.2.3",
+    version=__version__,
     author="Nitipit Nontasuwan",
     author_email="nitipit@gmail.com",
     url="http://nitipit.github.com/markdo/",
     license="MIT",
     description="Markdown editor for Gnome",
-    platforms=['linux'],
+    platforms=['linux', 'gnome'],
     keywords=['editor', 'markdown'],
 
     # Setup config
@@ -29,5 +30,5 @@ setup(
     package_dir={'markdo': 'markdo'},
     package_data={'markdo': data},
     scripts=['markdo/markdo'],
-    install_requires=['appkit>=0.2.6',]
+    install_requires=['appkit>=0.2.8',]
 )
