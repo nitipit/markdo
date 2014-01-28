@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from appkit.api.v0_2_6 import App
+from appkit.api.v0_2_8 import App
 from flask import render_template, request
 import os
 import sys
@@ -29,7 +29,7 @@ def index():
 @app.route('/save/', methods=['POST',])
 def save():
     """save markdown content to the file"""
-    
+
     file_name = request.form.get('file', None)
     text = request.form.get('text', None)
 
