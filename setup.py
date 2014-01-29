@@ -15,7 +15,7 @@ for d in os.walk('markdo/'):
 setup(
     # Metadata
     name="MarkDo",
-    version='0.2.4',
+    version='0.2.6',
     author="Nitipit Nontasuwan",
     author_email="nitipit@gmail.com",
     url="http://nitipit.github.com/markdo/",
