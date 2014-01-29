@@ -1,2 +1,19 @@
-body {
+.row {
+	min-width: 85% !important;
+}
+
+.CodeMirror {
+    border: 1px solid #aaa;
+    font-size: 1.1em;
+    line-height: 1.5em;
+}
+.CodeMirror-scroll {
+    height: auto;
+    min-height: 400px;
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+
+#result {
+	word-wrap: break-word;
 }
