@@ -1,6 +1,12 @@
 # MarkDo - Markdown editor for Gnome
 ---
 
+## Changes in version 0.2.8
+- Fix critical bug that markdo can't save re-opened file.
+
+## Changes in version 0.2.6
+- User appkit v0.2.8
+
 ## Changes in version 0.2.3
 - Update JS and CSS Library
 - require appkit >= 0.2.6

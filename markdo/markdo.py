@@ -16,6 +16,7 @@ except:
     file_name = None
 
 app.file_name = file_name
+print(app.file_name)
 
 
 @app.route('/')
@@ -23,7 +24,10 @@ def index():
     markdown = None
     if app.file_name is not None:
         markdown = codecs.open(file_name, 'r', 'utf-8').read()
-    return render_template('/ui.html', text=markdown)
+    return render_template(
+            '/ui.html',
+            file_name=app.file_name,
+            text=markdown)
 
 
 @app.route('/save/', methods=['POST',])
