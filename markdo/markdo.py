@@ -37,10 +37,10 @@ def save():
     file_name = request.form.get('file', None)
     text = request.form.get('text', None)
 
-    f = open(file_name, 'w')
+    f = codecs.open(file_name, 'w', encoding='utf-8')
     f.write(text)
     f.close()
     return 'Saved'
 
-if __name__ == '__main__':
-    app.run()
+app.debug = True
+app.run()
