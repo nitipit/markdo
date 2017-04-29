@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined) {
+;((($, window, document, undefined) => {
   'use strict';
 
   Foundation.libs.alert = {
@@ -9,17 +9,17 @@
     settings : {
       animation: 'fadeOut',
       speed: 300, // fade out speed
-      callback: function (){}
+      callback() {}
     },
 
-    init : function (scope, method, options) {
+    init(scope, method, options) {
       this.bindings(method, options);
     },
 
-    events : function () {
+    events() {
       $(this.scope).off('.alert').on('click.fndtn.alert', '[data-alert] a.close', function (e) {
-          var alertBox = $(this).closest("[data-alert]"),
-              settings = alertBox.data('alert-init') || Foundation.libs.alert.settings;
+        var alertBox = $(this).closest("[data-alert]");
+        var settings = alertBox.data('alert-init') || Foundation.libs.alert.settings;
 
         e.preventDefault();
         alertBox[settings.animation](settings.speed, function () {
@@ -29,6 +29,6 @@
       });
     },
 
-    reflow : function () {}
+    reflow() {}
   };
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));

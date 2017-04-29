@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined) {
+;((($, window, document, undefined) => {
   'use strict';
 
   Foundation.libs.tooltip = {
@@ -12,7 +12,7 @@
       append_to: 'body',
       touch_close_text: 'Tap To Close',
       disable_for_touch: false,
-      tip_template : function (selector, content) {
+      tip_template(selector, content) {
         return '<span data-selector="' + selector + '" class="' 
           + Foundation.libs.tooltip.settings.tooltip_class.substring(1) 
           + '">' + content + '<span class="nub"></span></span>';
@@ -21,11 +21,11 @@
 
     cache : {},
 
-    init : function (scope, method, options) {
+    init(scope, method, options) {
       this.bindings(method, options);
     },
 
-    events : function () {
+    events() {
       var self = this;
 
       if (Modernizr.touch) {
@@ -61,7 +61,7 @@
       }
     },
 
-    showOrCreateTip : function ($target) {
+    showOrCreateTip($target) {
       var $tip = this.getTip($target);
 
       if ($tip && $tip.length > 0) {
@@ -71,9 +71,9 @@
       return this.create($target);
     },
 
-    getTip : function ($target) {
-      var selector = this.selector($target),
-          tip = null;
+    getTip($target) {
+      var selector = this.selector($target);
+      var tip = null;
 
       if (selector) {
         tip = $('span[data-selector="' + selector + '"]' + this.settings.tooltip_class);
@@ -82,9 +82,9 @@
       return (typeof tip === 'object') ? tip : false;
     },
 
-    selector : function ($target) {
-      var id = $target.attr('id'),
-          dataSelector = $target.attr('data-tooltip') || $target.attr('data-selector');
+    selector($target) {
+      var id = $target.attr('id');
+      var dataSelector = $target.attr('data-tooltip') || $target.attr('data-selector');
 
       if ((id && id.length < 1 || !id) && typeof dataSelector != 'string') {
         dataSelector = 'tooltip' + Math.random().toString(36).substring(7);
@@ -94,9 +94,9 @@
       return (id && id.length > 0) ? id : dataSelector;
     },
 
-    create : function ($target) {
-      var $tip = $(this.settings.tip_template(this.selector($target), $('<div></div>').html($target.attr('title')).html())),
-          classes = this.inheritable_classes($target);
+    create($target) {
+      var $tip = $(this.settings.tip_template(this.selector($target), $('<div></div>').html($target.attr('title')).html()));
+      var classes = this.inheritable_classes($target);
 
       $tip.addClass(classes).appendTo(this.settings.append_to);
       if (Modernizr.touch) {
@@ -106,8 +106,13 @@
       this.show($target);
     },
 
-    reposition : function (target, tip, classes) {
-      var width, nub, nubHeight, nubWidth, column, objPos;
+    reposition(target, tip, classes) {
+      var width;
+      var nub;
+      var nubHeight;
+      var nubWidth;
+      var column;
+      var objPos;
 
       tip.css('visibility', 'hidden').show();
 
@@ -115,17 +120,15 @@
       nub = tip.children('.nub');
       nubHeight = nub.outerHeight();
       nubWidth = nub.outerHeight();
-      
+
       tip.css({'width' : (width) ? width : 'auto'});
 
-      objPos = function (obj, top, right, bottom, left, width) {
-        return obj.css({
-          'top' : (top) ? top : 'auto',
-          'bottom' : (bottom) ? bottom : 'auto',
-          'left' : (left) ? left : 'auto',
-          'right' : (right) ? right : 'auto'
-        }).end();
-      };
+      objPos = (obj, top, right, bottom, left, width) => obj.css({
+        'top' : (top) ? top : 'auto',
+        'bottom' : (bottom) ? bottom : 'auto',
+        'left' : (left) ? left : 'auto',
+        'right' : (right) ? right : 'auto'
+      }).end();
 
       objPos(tip, (target.offset().top + target.outerHeight() + 10), 'auto', 'auto', target.offset().left);
 
@@ -155,49 +158,50 @@
       tip.css('visibility', 'visible').hide();
     },
 
-    small : function () {
+    small() {
       return matchMedia(Foundation.media_queries.small).matches;
     },
 
-    inheritable_classes : function (target) {
-      var inheritables = ['tip-top', 'tip-left', 'tip-bottom', 'tip-right', 'noradius'].concat(this.settings.additional_inheritable_classes),
-          classes = target.attr('class'),
-          filtered = classes ? $.map(classes.split(' '), function (el, i) {
-            if ($.inArray(el, inheritables) !== -1) {
-              return el;
-            }
-          }).join(' ') : '';
+    inheritable_classes(target) {
+      var inheritables = ['tip-top', 'tip-left', 'tip-bottom', 'tip-right', 'noradius'].concat(this.settings.additional_inheritable_classes);
+      var classes = target.attr('class');
+
+      var filtered = classes ? $.map(classes.split(' '), (el, i) => {
+        if ($.inArray(el, inheritables) !== -1) {
+          return el;
+        }
+      }).join(' ') : '';
 
       return $.trim(filtered);
     },
 
-    show : function ($target) {
+    show($target) {
       var $tip = this.getTip($target);
 
       this.reposition($target, $tip, $target.attr('class'));
       $tip.fadeIn(150);
     },
 
-    hide : function ($target) {
+    hide($target) {
       var $tip = this.getTip($target);
 
       $tip.fadeOut(150);
     },
 
     // deprecate reload
-    reload : function () {
+    reload() {
       var $self = $(this);
 
       return ($self.data('fndtn-tooltips')) ? $self.foundationTooltips('destroy').foundationTooltips('init') : $self.foundationTooltips('init');
     },
 
-    off : function () {
+    off() {
       $(this.scope).off('.fndtn.tooltip');
       $(this.settings.tooltip_class).each(function (i) {
         $('[data-tooltip]').get(i).attr('title', $(this).text());
       }).remove();
     },
 
-    reflow : function () {}
+    reflow() {}
   };
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));

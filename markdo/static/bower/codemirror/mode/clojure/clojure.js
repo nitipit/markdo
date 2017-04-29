@@ -2,19 +2,27 @@
  * Author: Hans Engel
  * Branched from CodeMirror's Scheme mode (by Koh Zi Han, based on implementation by Koh Zi Chun)
  */
-CodeMirror.defineMode("clojure", function (config, mode) {
-    var BUILTIN = "builtin", COMMENT = "comment", STRING = "string", TAG = "tag",
-        ATOM = "atom", NUMBER = "number", BRACKET = "bracket", KEYWORD = "keyword";
-    var INDENT_WORD_SKIP = 2, KEYWORDS_SKIP = 1;
+CodeMirror.defineMode("clojure", (config, mode) => {
+    var BUILTIN = "builtin";
+    var COMMENT = "comment";
+    var STRING = "string";
+    var TAG = "tag";
+    var ATOM = "atom";
+    var NUMBER = "number";
+    var BRACKET = "bracket";
+    var KEYWORD = "keyword";
+    var INDENT_WORD_SKIP = 2;
+    var KEYWORDS_SKIP = 1;
 
     function makeKeywords(str) {
-        var obj = {}, words = str.split(" ");
+        var obj = {};
+        var words = str.split(" ");
         for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
         return obj;
     }
 
     var atoms = makeKeywords("true false nil");
-    
+
     var keywords = makeKeywords(
       "defn defn- def def- defonce defmulti defmethod defmacro defstruct deftype defprotocol defrecord defproject deftest slice defalias defhinted defmacro- defn-memo defnk defnk defonce- defunbound defunbound- defvar defvar- let letfn do case cond condp for loop recur when when-not when-let when-first if if-let if-not . .. -> ->> doto and or dosync doseq dotimes dorun doall load import unimport ns in-ns refer try catch finally throw with-open with-local-vars binding gen-class gen-and-load-class gen-and-save-class handler-case handle");
 
@@ -96,7 +104,7 @@ CodeMirror.defineMode("clojure", function (config, mode) {
     }
 
     return {
-        startState: function () {
+        startState() {
             return {
                 indentStack: null,
                 indentation: 0,
@@ -104,7 +112,7 @@ CodeMirror.defineMode("clojure", function (config, mode) {
             };
         },
 
-        token: function (stream, state) {
+        token(stream, state) {
             if (state.indentStack == null && stream.sol()) {
                 // update indentation, but only if indentStack is empty
                 state.indentation = stream.indentation();
@@ -117,8 +125,10 @@ CodeMirror.defineMode("clojure", function (config, mode) {
             var returnType = null;
 
             switch(state.mode){
-                case "string": // multi-line string parsing mode
-                    var next, escaped = false;
+                case // multi-line string parsing mode
+                "string":
+                    var next;
+                    var escaped = false;
                     while ((next = stream.next()) != null) {
                         if (next == "\"" && !escaped) {
 
@@ -143,7 +153,9 @@ CodeMirror.defineMode("clojure", function (config, mode) {
                     } else if (isNumber(ch,stream)){
                         returnType = NUMBER;
                     } else if (ch == "(" || ch == "[" || ch == "{" ) {
-                        var keyWord = '', indentTemp = stream.column(), letter;
+                        var keyWord = '';
+                        var indentTemp = stream.column();
+                        var letter;
                         /**
                         Either
                         (indent-word ..
@@ -196,7 +208,7 @@ CodeMirror.defineMode("clojure", function (config, mode) {
             return returnType;
         },
 
-        indent: function (state, textAfter) {
+        indent(state, textAfter) {
             if (state.indentStack == null) return state.indentation;
             return state.indentStack.indent;
         }

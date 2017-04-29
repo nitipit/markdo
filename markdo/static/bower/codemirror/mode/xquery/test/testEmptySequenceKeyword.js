@@ -1,6 +1,6 @@
-$(document).ready(function(){
+$(document).ready(() => {
   module("testEmptySequenceKeyword");
-  test("testEmptySequenceKeyword", function() {
+  test("testEmptySequenceKeyword", () => {
     expect(1);
 
     var input = '"foo" instance of empty-sequence()';

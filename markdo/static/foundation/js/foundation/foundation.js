@@ -6,7 +6,7 @@
  * http://www.opensource.org/licenses/mit-license.php
 */
 
-(function ($, window, document, undefined) {
+((($, window, document, undefined) => {
   'use strict';
 
   // Used to retrieve Foundation media queries from CSS.
@@ -32,7 +32,7 @@
 
   // Enable FastClick if present
 
-  $(function() {
+  $(() => {
     if(typeof FastClick !== 'undefined') {
       // Don't attach to body if undefined
       if (typeof document.body !== 'undefined') {
@@ -44,7 +44,7 @@
   // private Fast Selector wrapper,
   // returns jQuery object. Only use where
   // getElementById is not available.
-  var S = function (selector, context) {
+  var S = (selector, context) => {
     if (typeof selector === 'string') {
       if (context) {
         return $(context.querySelectorAll(selector));
@@ -60,23 +60,24 @@
     https://github.com/paulirish/matchMedia.js
   */
 
-  window.matchMedia = window.matchMedia || (function( doc, undefined ) {
-
+  window.matchMedia = window.matchMedia || (((doc, undefined) => {
     "use strict";
 
-    var bool,
-        docElem = doc.documentElement,
-        refNode = docElem.firstElementChild || docElem.firstChild,
-        // fakeBody required for <FF4 when executed in <head>
-        fakeBody = doc.createElement( "body" ),
-        div = doc.createElement( "div" );
+    var bool;
+    var docElem = doc.documentElement;
+    var refNode = docElem.firstElementChild || docElem.firstChild;
+
+    var // fakeBody required for <FF4 when executed in <head>
+    fakeBody = doc.createElement( "body" );
+
+    var div = doc.createElement( "div" );
 
     div.id = "mq-test-1";
     div.style.cssText = "position:absolute;top:-100em";
     fakeBody.style.background = "none";
     fakeBody.appendChild(div);
 
-    return function(q){
+    return q => {
 
       div.innerHTML = "&shy;<style media=\"" + q + "\"> #mq-test-1 { width: 42px; }</style>";
 
@@ -90,8 +91,7 @@
       };
 
     };
-
-  }( document ));
+  })( document ));
 
   /*
    * jquery.requestAnimationFrame
@@ -102,67 +102,68 @@
    * Licensed under the MIT license.
    */
 
-  (function( $ ) {
+  (($ => {
+    // requestAnimationFrame polyfill adapted from Erik Möller
+    // fixes from Paul Irish and Tino Zijdel
+    // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+    // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
 
-  // requestAnimationFrame polyfill adapted from Erik Möller
-  // fixes from Paul Irish and Tino Zijdel
-  // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-  // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
 
+    var animating;
 
-  var animating,
-    lastTime = 0,
-    vendors = ['webkit', 'moz'],
-    requestAnimationFrame = window.requestAnimationFrame,
-    cancelAnimationFrame = window.cancelAnimationFrame;
+    var lastTime = 0;
+    var vendors = ['webkit', 'moz'];
+    var requestAnimationFrame = window.requestAnimationFrame;
+    var cancelAnimationFrame = window.cancelAnimationFrame;
 
-  for(; lastTime < vendors.length && !requestAnimationFrame; lastTime++) {
-    requestAnimationFrame = window[ vendors[lastTime] + "RequestAnimationFrame" ];
-    cancelAnimationFrame = cancelAnimationFrame ||
-      window[ vendors[lastTime] + "CancelAnimationFrame" ] || 
-      window[ vendors[lastTime] + "CancelRequestAnimationFrame" ];
-  }
-
-  function raf() {
-    if ( animating ) {
-      requestAnimationFrame( raf );
-      jQuery.fx.tick();
+    for(; lastTime < vendors.length && !requestAnimationFrame; lastTime++) {
+      requestAnimationFrame = window[ vendors[lastTime] + "RequestAnimationFrame" ];
+      cancelAnimationFrame = cancelAnimationFrame ||
+        window[ vendors[lastTime] + "CancelAnimationFrame" ] || 
+        window[ vendors[lastTime] + "CancelRequestAnimationFrame" ];
     }
-  }
 
-  if ( requestAnimationFrame ) {
-    // use rAF
-    window.requestAnimationFrame = requestAnimationFrame;
-    window.cancelAnimationFrame = cancelAnimationFrame;
-    jQuery.fx.timer = function( timer ) {
-      if ( timer() && jQuery.timers.push( timer ) && !animating ) {
-        animating = true;
-        raf();
+    function raf() {
+      if ( animating ) {
+        requestAnimationFrame( raf );
+        jQuery.fx.tick();
       }
-    };
+    }
 
-    jQuery.fx.stop = function() {
-      animating = false;
-    };
-  } else {
-    // polyfill
-    window.requestAnimationFrame = function( callback, element ) {
-      var currTime = new Date().getTime(),
-        timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) ),
-        id = window.setTimeout( function() {
+    if ( requestAnimationFrame ) {
+      // use rAF
+      window.requestAnimationFrame = requestAnimationFrame;
+      window.cancelAnimationFrame = cancelAnimationFrame;
+      jQuery.fx.timer = timer => {
+        if ( timer() && jQuery.timers.push( timer ) && !animating ) {
+          animating = true;
+          raf();
+        }
+      };
+
+      jQuery.fx.stop = () => {
+        animating = false;
+      };
+    } else {
+      // polyfill
+      window.requestAnimationFrame = (callback, element) => {
+        var currTime = new Date().getTime();
+        var timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
+
+        var id = window.setTimeout( () => {
           callback( currTime + timeToCall );
         }, timeToCall );
-      lastTime = currTime + timeToCall;
-      return id;
-    };
 
-    window.cancelAnimationFrame = function(id) {
-      clearTimeout(id);
-    };
-      
-  }
+        lastTime = currTime + timeToCall;
+        return id;
+      };
 
-  }( jQuery ));
+      window.cancelAnimationFrame = id => {
+        clearTimeout(id);
+      };
+        
+    }
+  })( jQuery ));
 
 
   function removeQuotes (string) {
@@ -188,10 +189,10 @@
 
     stylesheet : $('<style></style>').appendTo('head')[0].sheet,
 
-    init : function (scope, libraries, method, options, response) {
-      var library_arr,
-          args = [scope, method, options, response],
-          responses = [];
+    init(scope, libraries, method, options, response) {
+      var library_arr;
+      var args = [scope, method, options, response];
+      var responses = [];
 
       // check RTL
       this.rtl = /rtl/i.test(S('html').attr('dir'));
@@ -212,22 +213,22 @@
       return scope;
     },
 
-    init_lib : function (lib, args) {
+    init_lib(lib, args) {
       if (this.libs.hasOwnProperty(lib)) {
         this.patch(this.libs[lib]);
 
         if (args && args.hasOwnProperty(lib)) {
-          return this.libs[lib].init.apply(this.libs[lib], [this.scope, args[lib]]);
+          return this.libs[lib].init(...[this.scope, args[lib]]);
         }
 
         args = args instanceof Array ? args : Array(args);    // PATCH: added this line
-        return this.libs[lib].init.apply(this.libs[lib], args);
+        return this.libs[lib].init(...args);
       }
 
-      return function () {};
+      return () => {};
     },
 
-    patch : function (lib) {
+    patch(lib) {
       lib.scope = this.scope;
       lib['data_options'] = this.lib_methods.data_options;
       lib['bindings'] = this.lib_methods.bindings;
@@ -235,7 +236,7 @@
       lib.rtl = this.rtl;
     },
 
-    inherit : function (scope, methods) {
+    inherit(scope, methods) {
       var methods_arr = methods.split(' ');
 
       for (var i = methods_arr.length - 1; i >= 0; i--) {
@@ -245,7 +246,7 @@
       }
     },
 
-    random_str : function (length) {
+    random_str(length) {
       var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
 
       if (!length) {
@@ -263,23 +264,28 @@
 
     // methods that can be inherited in libraries
     lib_methods : {
-      throttle : function(fun, delay) {
+      throttle(fun, delay) {
         var timer = null;
 
         return function () {
-          var context = this, args = arguments;
+          var context = this;
+          var args = arguments;
 
           clearTimeout(timer);
-          timer = setTimeout(function () {
+          timer = setTimeout(() => {
             fun.apply(context, args);
           }, delay);
         };
       },
 
       // parses data-options attribute
-      data_options : function (el) {
-        var opts = {}, ii, p, opts_arr, opts_len,
-            data_options = el.data('options');
+      data_options(el) {
+        var opts = {};
+        var ii;
+        var p;
+        var opts_arr;
+        var opts_len;
+        var data_options = el.data('options');
 
         if (typeof data_options === 'object') {
           return data_options;
@@ -313,12 +319,12 @@
         return opts;
       },
 
-      delay : function (fun, delay) {
+      delay(fun, delay) {
         return setTimeout(fun, delay);
       },
 
       // test for empty object or array
-      empty : function (obj) {
+      empty(obj) {
         if (obj.length && obj.length > 0)    return false;
         if (obj.length && obj.length === 0)  return true;
 
@@ -329,14 +335,14 @@
         return true;
       },
 
-      register_media : function(media, media_class) {
+      register_media(media, media_class) {
         if(Foundation.media_queries[media] === undefined) {
           $('head').append('<meta class="' + media_class + '">');
           Foundation.media_queries[media] = removeQuotes($('.' + media_class).css('font-family'));
         }
       },
 
-      addCustomRule : function(rule, media) {
+      addCustomRule(rule, media) {
         if(media === undefined) {
           Foundation.stylesheet.insertRule(rule, Foundation.stylesheet.cssRules.length);
         } else {
@@ -348,7 +354,7 @@
         }
       },
 
-      loaded : function (image, callback) {
+      loaded(image, callback) {
         function loaded () {
           callback(image[0]);
         }
@@ -357,8 +363,8 @@
           this.one('load', loaded);
 
           if (/MSIE (\d+\.\d+);/.test(navigator.userAgent)) {
-            var src = this.attr( 'src' ),
-                param = src.match( /\?/ ) ? '&' : '?';
+            var src = this.attr( 'src' );
+            var param = src.match( /\?/ ) ? '&' : '?';
 
             param += 'random=' + (new Date()).getTime();
             this.attr('src', src + param);
@@ -377,9 +383,9 @@
         }
       },
 
-      bindings : function (method, options) {
-        var self = this,
-            should_bind_events = !S(this).data(this.name + '-init');
+      bindings(method, options) {
+        var self = this;
+        var should_bind_events = !S(this).data(this.name + '-init');
 
         if (typeof method === 'string') {
           return this[method].call(this, options);
@@ -411,9 +417,9 @@
     var args = Array.prototype.slice.call(arguments, 0);
 
     return this.each(function () {
-      Foundation.init.apply(Foundation, [this].concat(args));
+      Foundation.init(...[this].concat(args));
       return this;
     });
   };
 
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));

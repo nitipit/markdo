@@ -1,6 +1,6 @@
-  $(document).ready(function(){
+  $(document).ready(() => {
     module("testBase");
-    test("eviltest", function() {
+    test("eviltest", () => {
       expect(1);
 
       var input = 'xquery version &quot;1.0-ml&quot;;\

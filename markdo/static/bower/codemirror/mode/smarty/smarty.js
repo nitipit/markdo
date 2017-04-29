@@ -1,4 +1,4 @@
-CodeMirror.defineMode("smarty", function(config, parserConfig) {
+CodeMirror.defineMode("smarty", (config, parserConfig) => {
   var keyFuncs = ["debug", "extends", "function", "include", "literal"];
   var last;
   var regs = {
@@ -94,7 +94,8 @@ CodeMirror.defineMode("smarty", function(config, parserConfig) {
       while ((c = stream.eat(regs.validIdentifier))) {
         str += c;
       }
-      var i, j;
+      var i;
+      var j;
       for (i=0, j=keyFuncs.length; i<j; i++) {
         if (keyFuncs[i] == str) {
           return ret("keyword", "keyword");
@@ -108,7 +109,7 @@ CodeMirror.defineMode("smarty", function(config, parserConfig) {
   }
 
   function inAttribute(quote) {
-    return function(stream, state) {
+    return (stream, state) => {
       while (!stream.eol()) {
         if (stream.next() == quote) {
           state.tokenize = inSmarty;
@@ -120,7 +121,7 @@ CodeMirror.defineMode("smarty", function(config, parserConfig) {
   }
 
   function inBlock(style, terminator) {
-    return function(stream, state) {
+    return (stream, state) => {
       while (!stream.eol()) {
         if (stream.match(terminator)) {
           state.tokenize = tokenizer;
@@ -133,10 +134,10 @@ CodeMirror.defineMode("smarty", function(config, parserConfig) {
   }
 
   return {
-    startState: function() {
+    startState() {
       return { tokenize: tokenizer, mode: "smarty", last: null };
     },
-    token: function(stream, state) {
+    token(stream, state) {
       var style = state.tokenize(stream, state);
       state.last = last;
       return style;

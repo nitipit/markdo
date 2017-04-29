@@ -1,10 +1,10 @@
-CodeMirror.defineMode("plsql", function(config, parserConfig) {
-  var indentUnit       = config.indentUnit,
-      keywords         = parserConfig.keywords,
-      functions        = parserConfig.functions,
-      types            = parserConfig.types,
-      sqlplus          = parserConfig.sqlplus,
-      multiLineStrings = parserConfig.multiLineStrings;
+CodeMirror.defineMode("plsql", (config, parserConfig) => {
+  var indentUnit       = config.indentUnit;
+  var keywords         = parserConfig.keywords;
+  var functions        = parserConfig.functions;
+  var types            = parserConfig.types;
+  var sqlplus          = parserConfig.sqlplus;
+  var multiLineStrings = parserConfig.multiLineStrings;
   var isOperatorChar   = /[+\-*&%=<>!?:\/|]/;
   function chain(stream, state, f) {
     state.tokenize = f;
@@ -78,8 +78,10 @@ CodeMirror.defineMode("plsql", function(config, parserConfig) {
   }
 
   function tokenString(quote) {
-    return function(stream, state) {
-      var escaped = false, next, end = false;
+    return (stream, state) => {
+      var escaped = false;
+      var next;
+      var end = false;
       while ((next = stream.next()) != null) {
         if (next == quote && !escaped) {end = true; break;}
         escaped = !escaped && next == "\\";
@@ -91,7 +93,8 @@ CodeMirror.defineMode("plsql", function(config, parserConfig) {
   }
 
   function tokenComment(stream, state) {
-    var maybeEnd = false, ch;
+    var maybeEnd = false;
+    var ch;
     while (ch = stream.next()) {
       if (ch == "/" && maybeEnd) {
         state.tokenize = tokenBase;
@@ -105,14 +108,14 @@ CodeMirror.defineMode("plsql", function(config, parserConfig) {
   // Interface
 
   return {
-    startState: function(basecolumn) {
+    startState(basecolumn) {
       return {
         tokenize: tokenBase,
         startOfLine: true
       };
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       if (stream.eatSpace()) return null;
       var style = state.tokenize(stream, state);
       return style;
@@ -120,9 +123,10 @@ CodeMirror.defineMode("plsql", function(config, parserConfig) {
   };
 });
 
-(function() {
+((() => {
   function keywords(str) {
-    var obj = {}, words = str.split(" ");
+    var obj = {};
+    var words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
     return obj;
   }
@@ -214,4 +218,4 @@ CodeMirror.defineMode("plsql", function(config, parserConfig) {
     types: keywords(cTypes),
     sqlplus: keywords(cSqlplus)
   });
-}());
+})());

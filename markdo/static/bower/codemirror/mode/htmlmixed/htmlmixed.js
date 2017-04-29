@@ -1,4 +1,4 @@
-CodeMirror.defineMode("htmlmixed", function(config) {
+CodeMirror.defineMode("htmlmixed", config => {
   var htmlMode = CodeMirror.getMode(config, {name: "xml", htmlMode: true});
   var jsMode = CodeMirror.getMode(config, "javascript");
   var cssMode = CodeMirror.getMode(config, "css");
@@ -19,7 +19,8 @@ CodeMirror.defineMode("htmlmixed", function(config) {
   }
   function maybeBackup(stream, pat, style) {
     var cur = stream.current();
-    var close = cur.search(pat), m;
+    var close = cur.search(pat);
+    var m;
     if (close > -1) stream.backUp(cur.length - close);
     else if (m = cur.match(/<\/?$/)) {
       stream.backUp(cur.length);
@@ -47,23 +48,23 @@ CodeMirror.defineMode("htmlmixed", function(config) {
   }
 
   return {
-    startState: function() {
+    startState() {
       var state = htmlMode.startState();
       return {token: html, localState: null, mode: "html", htmlState: state};
     },
 
-    copyState: function(state) {
+    copyState(state) {
       if (state.localState)
         var local = CodeMirror.copyState(state.token == css ? cssMode : jsMode, state.localState);
       return {token: state.token, localState: local, mode: state.mode,
               htmlState: CodeMirror.copyState(htmlMode, state.htmlState)};
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       return state.token(stream, state);
     },
 
-    indent: function(state, textAfter) {
+    indent(state, textAfter) {
       if (state.token == html || /^\s*<\//.test(textAfter))
         return htmlMode.indent(state.htmlState, textAfter);
       else if (state.token == javascript)
@@ -74,9 +75,9 @@ CodeMirror.defineMode("htmlmixed", function(config) {
 
     electricChars: "/{}:",
 
-    innerMode: function(state) {
+    innerMode(state) {
       var mode = state.token == html ? htmlMode : state.token == javascript ? jsMode : cssMode;
-      return {state: state.localState || state.htmlState, mode: mode};
+      return {state: state.localState || state.htmlState, mode};
     }
   };
 }, "xml", "javascript", "css");

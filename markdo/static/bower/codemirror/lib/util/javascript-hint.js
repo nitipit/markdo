@@ -1,4 +1,4 @@
-(function () {
+((() => {
   function forEach(arr, f) {
     for (var i = 0, e = arr.length; i < e; ++i) f(arr[i]);
   }
@@ -18,12 +18,15 @@
 
   function scriptHint(editor, keywords, getToken, options) {
     // Find the token at the cursor
-    var cur = editor.getCursor(), token = getToken(editor, cur), tprop = token;
+    var cur = editor.getCursor();
+
+    var token = getToken(editor, cur);
+    var tprop = token;
     // If it's not a 'word-style' token, ignore the token.
-		if (!/^[\w$_]*$/.test(token.string)) {
-      token = tprop = {start: cur.ch, end: cur.ch, string: "", state: token.state,
-                       className: token.string == "." ? "property" : null};
-    }
+    if (!/^[\w$_]*$/.test(token.string)) {
+  token = tprop = {start: cur.ch, end: cur.ch, string: "", state: token.state,
+                   className: token.string == "." ? "property" : null};
+}
     // If it is a property, find out what it is a property of.
     while (tprop.className == "property") {
       tprop = getToken(editor, {line: cur.line, ch: tprop.start});
@@ -52,11 +55,9 @@
             to: {line: cur.line, ch: token.end}};
   }
 
-  CodeMirror.javascriptHint = function(editor, options) {
-    return scriptHint(editor, javascriptKeywords,
-                      function (e, cur) {return e.getTokenAt(cur);},
-                      options);
-  };
+  CodeMirror.javascriptHint = (editor, options) => scriptHint(editor, javascriptKeywords,
+                    (e, cur) => e.getTokenAt(cur),
+                    options);
 
   function getCoffeeScriptToken(editor, cur) {
   // This getToken, it is for coffeescript, imitates the behavior of
@@ -76,9 +77,7 @@
     return token;
   }
 
-  CodeMirror.coffeescriptHint = function(editor, options) {
-    return scriptHint(editor, coffeescriptKeywords, getCoffeeScriptToken, options);
-  };
+  CodeMirror.coffeescriptHint = (editor, options) => scriptHint(editor, coffeescriptKeywords, getCoffeeScriptToken, options);
 
   var stringProps = ("charAt charCodeAt indexOf lastIndexOf substring substr slice trim trimLeft trimRight " +
                      "toUpperCase toLowerCase split concat match replace search").split(" ");
@@ -91,7 +90,8 @@
                   "if in instanceof isnt new no not null of off on or return switch then throw true try typeof until void while with yes").split(" ");
 
   function getCompletions(token, context, keywords, options) {
-    var found = [], start = token.string;
+    var found = [];
+    var start = token.string;
     function maybeAdd(str) {
       if (str.indexOf(start) == 0 && !arrayContains(found, str)) found.push(str);
     }
@@ -105,7 +105,9 @@
     if (context) {
       // If this is a property, see if it belongs to some object we can
       // find in the current environment.
-      var obj = context.pop(), base;
+      var obj = context.pop();
+
+      var base;
       if (obj.className == "variable") {
         if (options && options.additionalContext)
           base = options.additionalContext[obj.string];
@@ -135,4 +137,4 @@
     }
     return found;
   }
-})();
+}))();

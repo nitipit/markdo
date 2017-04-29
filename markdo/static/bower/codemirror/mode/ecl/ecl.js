@@ -1,7 +1,8 @@
-CodeMirror.defineMode("ecl", function(config) {
+CodeMirror.defineMode("ecl", config => {
 
   function words(str) {
-    var obj = {}, words = str.split(" ");
+    var obj = {};
+    var words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
     return obj;
   }
@@ -104,8 +105,10 @@ CodeMirror.defineMode("ecl", function(config) {
   }
 
   function tokenString(quote) {
-    return function(stream, state) {
-      var escaped = false, next, end = false;
+    return (stream, state) => {
+      var escaped = false;
+      var next;
+      var end = false;
       while ((next = stream.next()) != null) {
         if (next == quote && !escaped) {end = true; break;}
         escaped = !escaped && next == "\\";
@@ -117,7 +120,8 @@ CodeMirror.defineMode("ecl", function(config) {
   }
 
   function tokenComment(stream, state) {
-    var maybeEnd = false, ch;
+    var maybeEnd = false;
+    var ch;
     while (ch = stream.next()) {
       if (ch == "/" && maybeEnd) {
         state.tokenize = tokenBase;
@@ -148,7 +152,7 @@ CodeMirror.defineMode("ecl", function(config) {
   // Interface
 
   return {
-    startState: function(basecolumn) {
+    startState(basecolumn) {
       return {
         tokenize: null,
         context: new Context((basecolumn || 0) - indentUnit, 0, "top", false),
@@ -157,7 +161,7 @@ CodeMirror.defineMode("ecl", function(config) {
       };
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       var ctx = state.context;
       if (stream.sol()) {
         if (ctx.align == null) ctx.align = false;
@@ -186,9 +190,10 @@ CodeMirror.defineMode("ecl", function(config) {
       return style;
     },
 
-    indent: function(state, textAfter) {
+    indent(state, textAfter) {
       if (state.tokenize != tokenBase && state.tokenize != null) return 0;
-      var ctx = state.context, firstChar = textAfter && textAfter.charAt(0);
+      var ctx = state.context;
+      var firstChar = textAfter && textAfter.charAt(0);
       if (ctx.type == "statement" && firstChar == "}") ctx = ctx.prev;
       var closing = firstChar == ctx.type;
       if (ctx.type == "statement") return ctx.indented + (firstChar == "{" ? 0 : indentUnit);

@@ -1,4 +1,4 @@
-CodeMirror.defineMode("sparql", function(config) {
+CodeMirror.defineMode("sparql", config => {
   var indentUnit = config.indentUnit;
   var curPunc;
 
@@ -49,7 +49,8 @@ CodeMirror.defineMode("sparql", function(config) {
         stream.eatWhile(/[\w\d_\-]/);
         return "atom";
       }
-      var word = stream.current(), type;
+      var word = stream.current();
+      var type;
       if (ops.test(word))
         return null;
       else if (keywords.test(word))
@@ -60,8 +61,9 @@ CodeMirror.defineMode("sparql", function(config) {
   }
 
   function tokenLiteral(quote) {
-    return function(stream, state) {
-      var escaped = false, ch;
+    return (stream, state) => {
+      var escaped = false;
+      var ch;
       while ((ch = stream.next()) != null) {
         if (ch == quote && !escaped) {
           state.tokenize = tokenBase;
@@ -74,7 +76,7 @@ CodeMirror.defineMode("sparql", function(config) {
   }
 
   function pushContext(state, type, col) {
-    state.context = {prev: state.context, indent: state.indent, col: col, type: type};
+    state.context = {prev: state.context, indent: state.indent, col, type};
   }
   function popContext(state) {
     state.indent = state.context.indent;
@@ -82,14 +84,14 @@ CodeMirror.defineMode("sparql", function(config) {
   }
 
   return {
-    startState: function(base) {
+    startState(base) {
       return {tokenize: tokenBase,
               context: null,
               indent: 0,
               col: 0};
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       if (stream.sol()) {
         if (state.context && state.context.align == null) state.context.align = false;
         state.indent = stream.indentation();
@@ -121,7 +123,7 @@ CodeMirror.defineMode("sparql", function(config) {
       return style;
     },
 
-    indent: function(state, textAfter) {
+    indent(state, textAfter) {
       var firstChar = textAfter && textAfter.charAt(0);
       var context = state.context;
       if (/[\]\}]/.test(firstChar))

@@ -1,12 +1,12 @@
-CodeMirror.defineMode("d", function(config, parserConfig) {
-  var indentUnit = config.indentUnit,
-      statementIndentUnit = parserConfig.statementIndentUnit || indentUnit,
-      keywords = parserConfig.keywords || {},
-      builtin = parserConfig.builtin || {},
-      blockKeywords = parserConfig.blockKeywords || {},
-      atoms = parserConfig.atoms || {},
-      hooks = parserConfig.hooks || {},
-      multiLineStrings = parserConfig.multiLineStrings;
+CodeMirror.defineMode("d", (config, parserConfig) => {
+  var indentUnit = config.indentUnit;
+  var statementIndentUnit = parserConfig.statementIndentUnit || indentUnit;
+  var keywords = parserConfig.keywords || {};
+  var builtin = parserConfig.builtin || {};
+  var blockKeywords = parserConfig.blockKeywords || {};
+  var atoms = parserConfig.atoms || {};
+  var hooks = parserConfig.hooks || {};
+  var multiLineStrings = parserConfig.multiLineStrings;
   var isOperatorChar = /[+\-*&%=<>!?|\/]/;
 
   var curPunc;
@@ -62,8 +62,10 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
   }
 
   function tokenString(quote) {
-    return function(stream, state) {
-      var escaped = false, next, end = false;
+    return (stream, state) => {
+      var escaped = false;
+      var next;
+      var end = false;
       while ((next = stream.next()) != null) {
         if (next == quote && !escaped) {end = true; break;}
         escaped = !escaped && next == "\\";
@@ -75,7 +77,8 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
   }
 
   function tokenComment(stream, state) {
-    var maybeEnd = false, ch;
+    var maybeEnd = false;
+    var ch;
     while (ch = stream.next()) {
       if (ch == "/" && maybeEnd) {
         state.tokenize = null;
@@ -87,7 +90,8 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
   }
 
   function tokenNestedComment(stream, state) {
-    var maybeEnd = false, ch;
+    var maybeEnd = false;
+    var ch;
     while (ch = stream.next()) {
       if (ch == "/" && maybeEnd) {
         state.tokenize = null;
@@ -121,7 +125,7 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
   // Interface
 
   return {
-    startState: function(basecolumn) {
+    startState(basecolumn) {
       return {
         tokenize: null,
         context: new Context((basecolumn || 0) - indentUnit, 0, "top", false),
@@ -130,7 +134,7 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
       };
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       var ctx = state.context;
       if (stream.sol()) {
         if (ctx.align == null) ctx.align = false;
@@ -159,9 +163,10 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
       return style;
     },
 
-    indent: function(state, textAfter) {
+    indent(state, textAfter) {
       if (state.tokenize != tokenBase && state.tokenize != null) return CodeMirror.Pass;
-      var ctx = state.context, firstChar = textAfter && textAfter.charAt(0);
+      var ctx = state.context;
+      var firstChar = textAfter && textAfter.charAt(0);
       if (ctx.type == "statement" && firstChar == "}") ctx = ctx.prev;
       var closing = firstChar == ctx.type;
       if (ctx.type == "statement") return ctx.indented + (firstChar == "{" ? 0 : statementIndentUnit);
@@ -173,9 +178,10 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
   };
 });
 
-(function() {
+((() => {
   function words(str) {
-    var obj = {}, words = str.split(" ");
+    var obj = {};
+    var words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
     return obj;
   }
@@ -202,4 +208,4 @@ CodeMirror.defineMode("d", function(config, parserConfig) {
       }
     }
   });
-}());
+})());

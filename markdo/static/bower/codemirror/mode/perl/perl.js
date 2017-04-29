@@ -1,6 +1,6 @@
 // CodeMirror2 mode/perl/perl.js (text/x-perl) beta 0.10 (2011-11-08)
 // This is a part of CodeMirror from https://github.com/sabaca/CodeMirror_mode_perl (mail@sabaca.com)
-CodeMirror.defineMode("perl",function(config,parserConfig){
+CodeMirror.defineMode("perl",(config, parserConfig) => {
 	// http://perldoc.perl.org
 	var PERL={				    	//   null - magic touch
 							//   1 - keyword
@@ -470,9 +470,11 @@ CodeMirror.defineMode("perl",function(config,parserConfig){
 		state.chain=null;                               //                                                          12   3tail
 		state.style=null;
 		state.tail=null;
-		state.tokenize=function(stream,state){
-			var e=false,c,i=0;
-			while(c=stream.next()){
+		state.tokenize=(stream, state) => {
+            var e=false;
+            var c;
+            var i=0;
+            while(c=stream.next()){
 				if(c===chain[i]&&!e){
 					if(chain[++i]!==undefined){
 						state.chain=chain[i];
@@ -483,11 +485,12 @@ CodeMirror.defineMode("perl",function(config,parserConfig){
 					state.tokenize=tokenPerl;
 					return style;}
 				e=!e&&c=="\\";}
-			return style;};
+            return style;
+        };
 		return state.tokenize(stream,state);}
 
 	function tokenSOMETHING(stream,state,string){
-		state.tokenize=function(stream,state){
+		state.tokenize=(stream, state) => {
 			if(stream.string==string)
 				state.tokenize=tokenPerl;
 			stream.skipToEnd();
@@ -766,14 +769,14 @@ CodeMirror.defineMode("perl",function(config,parserConfig){
 				return "meta";}
 		return null;}
 
-	return{
-		startState:function(){
+	return {
+		startState() {
 			return{
 				tokenize:tokenPerl,
 				chain:null,
 				style:null,
 				tail:null};},
-		token:function(stream,state){
+		token(stream, state) {
 			return (state.tokenize||tokenPerl)(stream,state);},
 		electricChars:"{}"};});
 

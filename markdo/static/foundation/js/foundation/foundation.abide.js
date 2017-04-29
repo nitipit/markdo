@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined) {
+;((($, window, document, undefined) => {
   'use strict';
 
   Foundation.libs.abide = {
@@ -46,14 +46,14 @@
 
     timer : null,
 
-    init : function (scope, method, options) {
+    init(scope, method, options) {
       this.bindings(method, options);
     },
 
-    events : function (scope) {
-      var self = this,
-          form = $(scope).attr('novalidate', 'novalidate'),
-          settings = form.data('abide-init');
+    events(scope) {
+      var self = this;
+      var form = $(scope).attr('novalidate', 'novalidate');
+      var settings = form.data('abide-init');
 
       form
         .off('.abide')
@@ -69,17 +69,17 @@
           .on('keydown.fndtn.abide', function (e) {
             var settings = $(this).closest('form').data('abide-init');
             clearTimeout(self.timer);
-            self.timer = setTimeout(function () {
+            self.timer = setTimeout(() => {
               self.validate([this], e);
-            }.bind(this), settings.timeout);
+            }, settings.timeout);
           });
     },
 
-    validate : function (els, e, is_ajax) {
-      var validations = this.parse_patterns(els),
-          validation_count = validations.length,
-          form = $(els[0]).closest('form'),
-          submit_event = /submit/.test(e.type);
+    validate(els, e, is_ajax) {
+      var validations = this.parse_patterns(els);
+      var validation_count = validations.length;
+      var form = $(els[0]).closest('form');
+      var submit_event = /submit/.test(e.type);
 
       for (var i=0; i < validation_count; i++) {
         if (!validations[i] && (submit_event || is_ajax)) {
@@ -101,9 +101,9 @@
       return true;
     },
 
-    parse_patterns : function (els) {
-      var count = els.length,
-          el_patterns = [];
+    parse_patterns(els) {
+      var count = els.length;
+      var el_patterns = [];
 
       for (var i = count - 1; i >= 0; i--) {
         el_patterns.push(this.pattern(els[i]));
@@ -112,9 +112,9 @@
       return this.check_validation_and_apply_styles(el_patterns);
     },
 
-    pattern : function (el) {
-      var type = el.getAttribute('type'),
-          required = typeof el.getAttribute('required') === 'string';
+    pattern(el) {
+      var type = el.getAttribute('type');
+      var required = typeof el.getAttribute('required') === 'string';
 
       var pattern = el.getAttribute('pattern') || '';
 
@@ -123,7 +123,7 @@
       } else if (pattern.length > 0) {
         return [el, new RegExp(pattern), required];
       }
-      
+
       if (this.settings.patterns.hasOwnProperty(type)) {
         return [el, this.settings.patterns[type], required];
       }
@@ -133,19 +133,19 @@
       return [el, pattern, required];
     },
 
-    check_validation_and_apply_styles : function (el_patterns) {
-      var count = el_patterns.length,
-          validations = [];
+    check_validation_and_apply_styles(el_patterns) {
+      var count = el_patterns.length;
+      var validations = [];
 
       for (var i = count - 1; i >= 0; i--) {
-        var el = el_patterns[i][0],
-            required = el_patterns[i][2],
-            value = el.value,
-            is_equal = el.getAttribute('data-equalto'),
-            is_radio = el.type === "radio",
-            is_checkbox = el.type === "checkbox",
-            label = $('label[for="' + el.getAttribute('id') + '"]'),
-            valid_length = (required) ? (el.value.length > 0) : true;
+        var el = el_patterns[i][0];
+        var required = el_patterns[i][2];
+        var value = el.value;
+        var is_equal = el.getAttribute('data-equalto');
+        var is_radio = el.type === "radio";
+        var is_checkbox = el.type === "checkbox";
+        var label = $('label[for="' + el.getAttribute('id') + '"]');
+        var valid_length = (required) ? (el.value.length > 0) : true;
 
         if (is_radio && required) {
           validations.push(this.valid_radio(el, required));
@@ -172,9 +172,9 @@
       return validations;
     },
 
-    valid_checkbox : function(el, required) {
-      var el = $(el),
-          valid = (el.is(':checked') || !required);
+    valid_checkbox(el, required) {
+      var el = $(el);
+      var valid = (el.is(':checked') || !required);
       if (valid) {
         el.removeAttr('data-invalid').parent().removeClass('error');
       } else {
@@ -184,11 +184,11 @@
       return valid;
     },
 
-    valid_radio : function (el, required) {
-      var name = el.getAttribute('name'),
-          group = document.getElementsByName(name),
-          count = group.length,
-          valid = false;
+    valid_radio(el, required) {
+      var name = el.getAttribute('name');
+      var group = document.getElementsByName(name);
+      var count = group.length;
+      var valid = false;
 
       for (var i=0; i < count; i++) {
         if (group[i].checked) valid = true;
@@ -205,10 +205,10 @@
       return valid;
     },
 
-    valid_equal: function(el, required) {
-      var from  = document.getElementById(el.getAttribute('data-equalto')).value,
-          to    = el.value,
-          valid = (from === to);
+    valid_equal(el, required) {
+      var from  = document.getElementById(el.getAttribute('data-equalto')).value;
+      var to    = el.value;
+      var valid = (from === to);
 
       if (valid) {
         $(el).removeAttr('data-invalid').parent().removeClass('error');
@@ -219,4 +219,4 @@
       return valid;
     }
   };
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));

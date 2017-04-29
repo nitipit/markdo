@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined) {
+;((($, window, document, undefined) => {
   'use strict';
 
   Foundation.libs.dropdown = {
@@ -9,17 +9,17 @@
     settings : {
       active_class: 'open',
       is_hover: false,
-      opened: function(){},
-      closed: function(){}
+      opened() {},
+      closed() {}
     },
 
-    init : function (scope, method, options) {
+    init(scope, method, options) {
       Foundation.inherit(this, 'throttle');
 
       this.bindings(method, options);
     },
 
-    events : function (scope) {
+    events(scope) {
       var self = this;
 
       $(this.scope)
@@ -37,8 +37,8 @@
           clearTimeout(self.timeout);
 
           if ($this.data('dropdown')) {
-            var dropdown = $('#' + $this.data('dropdown')),
-                target = $this;
+            var dropdown = $('#' + $this.data('dropdown'));
+            var target = $this;
           } else {
             var dropdown = $this;
                 target = $("[data-dropdown='" + dropdown.attr('id') + "']");
@@ -50,22 +50,22 @@
             self.closeall.call(self);
           }
           
-          if (settings.is_hover) self.open.apply(self, [dropdown, target]);
+          if (settings.is_hover) self.open(...[dropdown, target]);
         })
         .on('mouseleave.fndtn.dropdown', '[data-dropdown], [data-dropdown-content]', function (e) {
           var $this = $(this);
-          self.timeout = setTimeout(function () {
+          self.timeout = setTimeout(() => {
             if ($this.data('dropdown')) {
               var settings = $this.data('dropdown-init') || self.settings;
               if (settings.is_hover) self.close.call(self, $('#' + $this.data('dropdown')));
             } else {
-              var target = $('[data-dropdown="' + $(this).attr('id') + '"]'),
-                  settings = target.data('dropdown-init') || self.settings;
+              var target = $('[data-dropdown="' + $(this).attr('id') + '"]');
+              var settings = target.data('dropdown-init') || self.settings;
               if (settings.is_hover) self.close.call(self, $this);
             }
-          }.bind(this), 150);
+          }, 150);
         })
-        .on('click.fndtn.dropdown', function (e) {
+        .on('click.fndtn.dropdown', e => {
           var parent = $(e.target).closest('[data-dropdown-content]');
 
           if ($(e.target).data('dropdown') || $(e.target).parent().data('dropdown')) {
@@ -89,12 +89,12 @@
 
       $(window)
         .off('.dropdown')
-        .on('resize.fndtn.dropdown', self.throttle(function () {
+        .on('resize.fndtn.dropdown', self.throttle(() => {
           self.resize.call(self);
         }, 50)).trigger('resize');
     },
 
-    close: function (dropdown) {
+    close(dropdown) {
       var self = this;
       dropdown.each(function () {
         if ($(this).hasClass(self.settings.active_class)) {
@@ -106,21 +106,21 @@
       });
     },
 
-    closeall: function() {
+    closeall() {
       var self = this;
       $.each($('[data-dropdown-content]'), function() {
         self.close.call(self, $(this))
       });
     },
 
-    open: function (dropdown, target) {
+    open(dropdown, target) {
         this
           .css(dropdown
             .addClass(this.settings.active_class), target);
         dropdown.trigger('opened');
     },
 
-    toggle : function (target) {
+    toggle(target) {
       var dropdown = $('#' + target.data('dropdown'));
       if (dropdown.length === 0) {
         // No dropdown found, not continuing
@@ -137,18 +137,18 @@
       }
     },
 
-    resize : function () {
-      var dropdown = $('[data-dropdown-content].open'),
-          target = $("[data-dropdown='" + dropdown.attr('id') + "']");
+    resize() {
+      var dropdown = $('[data-dropdown-content].open');
+      var target = $("[data-dropdown='" + dropdown.attr('id') + "']");
 
       if (dropdown.length && target.length) {
         this.css(dropdown, target);
       }
     },
 
-    css : function (dropdown, target) {
-      var offset_parent = dropdown.offsetParent(),
-          position = target.offset();
+    css(dropdown, target) {
+      var offset_parent = dropdown.offsetParent();
+      var position = target.offset();
 
       position.top -= offset_parent.offset().top;
       position.left -= offset_parent.offset().left;
@@ -177,19 +177,19 @@
         dropdown.attr('style', '').css({
           position : 'absolute',
           top: position.top + target.outerHeight(),
-          left: left
+          left
         });
       }
 
       return dropdown;
     },
 
-    small : function () {
+    small() {
       return matchMedia(Foundation.media_queries.small).matches &&
         !matchMedia(Foundation.media_queries.medium).matches;
     },
 
-    off: function () {
+    off() {
       $(this.scope).off('.fndtn.dropdown');
       $('html, body').off('.fndtn.dropdown');
       $(window).off('.fndtn.dropdown');
@@ -197,6 +197,6 @@
       this.settings.init = false;
     },
 
-    reflow : function () {}
+    reflow() {}
   };
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));

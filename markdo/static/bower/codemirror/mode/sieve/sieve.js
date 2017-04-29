@@ -3,9 +3,10 @@
  * is released.
  */
 
-CodeMirror.defineMode("sieve", function(config) {
+CodeMirror.defineMode("sieve", config => {
   function words(str) {
-    var obj = {}, words = str.split(" ");
+    var obj = {};
+    var words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
     return obj;
   }
@@ -127,7 +128,8 @@ CodeMirror.defineMode("sieve", function(config) {
   }
 
   function tokenCComment(stream, state) {
-    var maybeEnd = false, ch;
+    var maybeEnd = false;
+    var ch;
     while ((ch = stream.next()) != null) {
       if (maybeEnd && ch == "/") {
         state.tokenize = tokenBase;
@@ -139,8 +141,9 @@ CodeMirror.defineMode("sieve", function(config) {
   }
 
   function tokenString(quote) {
-    return function(stream, state) {
-      var escaped = false, ch;
+    return (stream, state) => {
+      var escaped = false;
+      var ch;
       while ((ch = stream.next()) != null) {
         if (ch == quote && !escaped)
           break;
@@ -152,20 +155,20 @@ CodeMirror.defineMode("sieve", function(config) {
   }
 
   return {
-    startState: function(base) {
+    startState(base) {
       return {tokenize: tokenBase,
               baseIndent: base || 0,
               _indent: []};
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       if (stream.eatSpace())
         return null;
 
       return (state.tokenize || tokenBase)(stream, state);;
     },
 
-    indent: function(state, textAfter) {
+    indent(state, textAfter) {
       var length = state._indent.length;
       if (textAfter && (textAfter[0] == "}"))
         length--;

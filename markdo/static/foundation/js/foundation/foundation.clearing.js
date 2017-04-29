@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined) {
+;((($, window, document, undefined) => {
   'use strict';
 
   Foundation.libs.clearing = {
@@ -23,7 +23,7 @@
       locked : false
     },
 
-    init : function (scope, method, options) {
+    init(scope, method, options) {
       var self = this;
       Foundation.inherit(this, 'throttle loaded');
 
@@ -38,18 +38,18 @@
       }
     },
 
-    events : function (scope) {
+    events(scope) {
       var self = this;
 
       $(this.scope)
         .off('.clearing')
         .on('click.fndtn.clearing', 'ul[data-clearing] li',
           function (e, current, target) {
-            var current = current || $(this),
-                target = target || current,
-                next = current.next('li'),
-                settings = current.closest('[data-clearing]').data('clearing-init'),
-                image = $(e.target);
+            var current = current || $(this);
+            var target = target || current;
+            var next = current.next('li');
+            var settings = current.closest('[data-clearing]').data('clearing-init');
+            var image = $(e.target);
 
             e.preventDefault();
 
@@ -73,21 +73,21 @@
           })
 
         .on('click.fndtn.clearing', '.clearing-main-next',
-          function (e) { self.nav(e, 'next') })
+          e => { self.nav(e, 'next') })
         .on('click.fndtn.clearing', '.clearing-main-prev',
-          function (e) { self.nav(e, 'prev') })
+          e => { self.nav(e, 'prev') })
         .on('click.fndtn.clearing', this.settings.close_selectors,
           function (e) { Foundation.libs.clearing.close(e, this) })
         .on('keydown.fndtn.clearing',
-          function (e) { self.keydown(e) });
+          e => { self.keydown(e) });
 
       $(window).off('.clearing').on('resize.fndtn.clearing',
-        function () { self.resize() });
+        () => { self.resize() });
 
       this.swipe_events(scope);
     },
 
-    swipe_events : function (scope) {
+    swipe_events(scope) {
       var self = this;
 
       $(this.scope)
@@ -134,30 +134,32 @@
         });
     },
 
-    assemble : function ($li) {
+    assemble($li) {
       var $el = $li.parent();
 
       if ($el.parent().hasClass('carousel')) return;
       $el.after('<div id="foundationClearingHolder"></div>');
 
-      var holder = $('#foundationClearingHolder'),
-          settings = $el.data('clearing-init'),
-          grid = $el.detach(),
-          data = {
-            grid: '<div class="carousel">' + grid[0].outerHTML + '</div>',
-            viewing: settings.templates.viewing
-          },
-          wrapper = '<div class="clearing-assembled"><div>' + data.viewing +
-            data.grid + '</div></div>';
+      var holder = $('#foundationClearingHolder');
+      var settings = $el.data('clearing-init');
+      var grid = $el.detach();
+
+      var data = {
+        grid: '<div class="carousel">' + grid[0].outerHTML + '</div>',
+        viewing: settings.templates.viewing
+      };
+
+      var wrapper = '<div class="clearing-assembled"><div>' + data.viewing +
+        data.grid + '</div></div>';
 
       return holder.after(wrapper).remove();
     },
 
-    open : function ($image, current, target) {
-      var root = target.closest('.clearing-assembled'),
-          container = $('div', root).first(),
-          visible_image = $('.visible-img', container),
-          image = $('img', visible_image).not($image);
+    open($image, current, target) {
+      var root = target.closest('.clearing-assembled');
+      var container = $('div', root).first();
+      var visible_image = $('.visible-img', container);
+      var image = $('img', visible_image).not($image);
 
       if (!this.locked()) {
         // set the image to the selected thumbnail
@@ -165,7 +167,7 @@
           .attr('src', this.load($image))
           .css('visibility', 'hidden');
 
-        this.loaded(image, function () {
+        this.loaded(image, () => {
           image.css('visibility', 'visible');
           // toggle the gallery
           root.addClass('clearing-blackout');
@@ -174,24 +176,27 @@
           this.fix_height(target)
             .caption($('.clearing-caption', visible_image), $image)
             .center(image)
-            .shift(current, target, function () {
+            .shift(current, target, () => {
               target.siblings().removeClass('visible');
               target.addClass('visible');
             });
-        }.bind(this));
+        });
       }
     },
 
-    close : function (e, el) {
+    close(e, el) {
       e.preventDefault();
 
-      var root = (function (target) {
+      var root = ((target => {
             if (/blackout/.test(target.selector)) {
               return target;
             } else {
               return target.closest('.clearing-blackout');
             }
-          }($(el))), container, visible_image;
+          })($(el)));
+
+      var container;
+      var visible_image;
 
       if (el === e.target && root) {
         container = $('div', root).first();
@@ -207,29 +212,29 @@
       return false;
     },
 
-    is_open : function (current) {
+    is_open(current) {
       return current.parent().prop('style').length > 0;
     },
 
-    keydown : function (e) {
-      var clearing = $('ul[data-clearing]', '.clearing-blackout'),
-          NEXT_KEY = this.rtl ? 37 : 39,
-          PREV_KEY = this.rtl ? 39 : 37,
-          ESC_KEY = 27;
+    keydown(e) {
+      var clearing = $('ul[data-clearing]', '.clearing-blackout');
+      var NEXT_KEY = this.rtl ? 37 : 39;
+      var PREV_KEY = this.rtl ? 39 : 37;
+      var ESC_KEY = 27;
 
       if (e.which === NEXT_KEY) this.go(clearing, 'next');
       if (e.which === PREV_KEY) this.go(clearing, 'prev');
       if (e.which === ESC_KEY) $('a.clearing-close').trigger('click');
     },
 
-    nav : function (e, direction) {
+    nav(e, direction) {
       var clearing = $('ul[data-clearing]', '.clearing-blackout');
 
       e.preventDefault();
       this.go(clearing, direction);
     },
 
-    resize : function () {
+    resize() {
       var image = $('img', '.clearing-blackout .visible-img');
 
       if (image.length) {
@@ -238,25 +243,25 @@
     },
 
     // visual adjustments
-    fix_height : function (target) {
-      var lis = target.parent().children(),
-          self = this;
+    fix_height(target) {
+      var lis = target.parent().children();
+      var self = this;
 
       lis.each(function () {
-          var li = $(this),
-              image = li.find('img');
+        var li = $(this);
+        var image = li.find('img');
 
-          if (li.height() > image.outerHeight()) {
-            li.addClass('fix-height');
-          }
-        })
+        if (li.height() > image.outerHeight()) {
+          li.addClass('fix-height');
+        }
+      })
         .closest('ul')
         .width(lis.length * 100 + '%');
 
       return this;
     },
 
-    update_paddles : function (target) {
+    update_paddles(target) {
       var visible_image = target
         .closest('.carousel')
         .siblings('.visible-img');
@@ -278,7 +283,7 @@
       }
     },
 
-    center : function (target) {
+    center(target) {
       if (!this.rtl) {
         target.css({
           marginLeft : -(target.outerWidth() / 2),
@@ -297,7 +302,7 @@
 
     // image loading and preloading
 
-    load : function ($image) {
+    load($image) {
       if ($image[0].nodeName === "A") {
         var href = $image.attr('href');
       } else {
@@ -310,16 +315,16 @@
       return $image.attr('src');
     },
 
-    preload : function ($image) {
+    preload($image) {
       this
         .img($image.closest('li').next())
         .img($image.closest('li').prev());
     },
 
-    img : function (img) {
+    img(img) {
       if (img.length) {
-        var new_img = new Image(),
-            new_a = $('a', img);
+        var new_img = new Image();
+        var new_a = $('a', img);
 
         if (new_a.length) {
           new_img.src = new_a.attr('href');
@@ -332,7 +337,7 @@
 
     // image caption
 
-    caption : function (container, $image) {
+    caption(container, $image) {
       var caption = $image.data('caption');
 
       if (caption) {
@@ -349,9 +354,9 @@
 
     // directional methods
 
-    go : function ($ul, direction) {
-      var current = $('.visible', $ul),
-          target = current[direction]();
+    go($ul, direction) {
+      var current = $('.visible', $ul);
+      var target = current[direction]();
 
       if (target.length) {
         $('img', target)
@@ -359,14 +364,14 @@
       }
     },
 
-    shift : function (current, target, callback) {
-      var clearing = target.parent(),
-          old_index = this.settings.prev_index || target.index(),
-          direction = this.direction(clearing, current, target),
-          dir = this.rtl ? 'right' : 'left',
-          left = parseInt(clearing.css('left'), 10),
-          width = target.outerWidth(),
-          skip_shift;
+    shift(current, target, callback) {
+      var clearing = target.parent();
+      var old_index = this.settings.prev_index || target.index();
+      var direction = this.direction(clearing, current, target);
+      var dir = this.rtl ? 'right' : 'left';
+      var left = parseInt(clearing.css('left'), 10);
+      var width = target.outerWidth();
+      var skip_shift;
 
       var dir_obj = {};
 
@@ -401,12 +406,12 @@
       callback();
     },
 
-    direction : function ($el, current, target) {
-      var lis = $('li', $el),
-          li_width = lis.outerWidth() + (lis.outerWidth() / 4),
-          up_count = Math.floor($('.clearing-container').outerWidth() / li_width) - 1,
-          target_index = lis.index(target),
-          response;
+    direction($el, current, target) {
+      var lis = $('li', $el);
+      var li_width = lis.outerWidth() + (lis.outerWidth() / 4);
+      var up_count = Math.floor($('.clearing-container').outerWidth() / li_width) - 1;
+      var target_index = lis.index(target);
+      var response;
 
       this.settings.up_count = up_count;
 
@@ -429,7 +434,7 @@
       return response;
     },
 
-    adjacent : function (current_index, target_index) {
+    adjacent(current_index, target_index) {
       for (var i = target_index + 1; i >= target_index - 1; i--) {
         if (i === current_index) return true;
       }
@@ -438,26 +443,26 @@
 
     // lock management
 
-    lock : function () {
+    lock() {
       this.settings.locked = true;
     },
 
-    unlock : function () {
+    unlock() {
       this.settings.locked = false;
     },
 
-    locked : function () {
+    locked() {
       return this.settings.locked;
     },
 
-    off : function () {
+    off() {
       $(this.scope).off('.fndtn.clearing');
       $(window).off('.fndtn.clearing');
     },
 
-    reflow : function () {
+    reflow() {
       this.init();
     }
   };
 
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));

@@ -1,10 +1,10 @@
-CodeMirror.defineMode("yaml", function() {
+CodeMirror.defineMode("yaml", () => {
 	
 	var cons = ['true', 'false', 'on', 'off', 'yes', 'no'];
 	var keywordRegex = new RegExp("\\b(("+cons.join(")|(")+"))$", 'i');
 	
 	return {
-		token: function(stream, state) {
+		token(stream, state) {
 			var ch = stream.peek();
 			var esc = state.escaped;
 			state.escaped = false;
@@ -78,7 +78,7 @@ CodeMirror.defineMode("yaml", function() {
 			stream.next();
 			return null;
 		},
-		startState: function() {
+		startState() {
 			return {
 				pair: false,
 				pairStart: false,

@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined) {
+;((($, window, document, undefined) => {
   'use strict';
 
   Foundation.libs.offcanvas = {
@@ -8,17 +8,17 @@
 
     settings : {},
 
-    init : function (scope, method, options) {
+    init(scope, method, options) {
       this.events();
     },
 
-    events : function () {
+    events() {
       $(this.scope).off('.offcanvas')
         .on('click.fndtn.offcanvas', '.left-off-canvas-toggle', function (e) {
           e.preventDefault();
           $(this).closest('.off-canvas-wrap').toggleClass('move-right');
         })
-        .on('click.fndtn.offcanvas', '.exit-off-canvas', function (e) {
+        .on('click.fndtn.offcanvas', '.exit-off-canvas', e => {
           e.preventDefault();
           $(".off-canvas-wrap").removeClass("move-right");
         })
@@ -26,12 +26,12 @@
           e.preventDefault();
           $(this).closest(".off-canvas-wrap").toggleClass("move-left");
         })
-        .on('click.fndtn.offcanvas', '.exit-off-canvas', function (e) {
+        .on('click.fndtn.offcanvas', '.exit-off-canvas', e => {
           e.preventDefault();
           $(".off-canvas-wrap").removeClass("move-left");
         });
     },
 
-    reflow : function () {}
+    reflow() {}
   };
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));

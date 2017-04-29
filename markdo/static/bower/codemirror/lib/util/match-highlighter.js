@@ -3,7 +3,7 @@
 	//myCodeMirror.matchHighlight(minChars);
 // And including a special span.CodeMirror-matchhighlight css class (also optionally a separate one for .CodeMirror-focused -- see demo matchhighlighter.html)
 
-(function() {
+((() => {
   var DEFAULT_MIN_CHARS = 2;
   
   function MatchHighlightState() {
@@ -26,7 +26,7 @@
 	if (cm.somethingSelected() && cm.getSelection().replace(/^\s+|\s+$/g, "").length >= minChars) {
 		var state = getMatchHighlightState(cm);
 		var query = cm.getSelection();
-		cm.operation(function() {
+		cm.operation(() => {
 			if (cm.lineCount() < 2000) { // This is too expensive on big documents.
 			  for (var cursor = cm.getSearchCursor(query); cursor.findNext();) {
 				//Only apply matchhighlight to the matches other than the one actually selected
@@ -41,4 +41,4 @@
   CodeMirror.defineExtension("matchHighlight", function(className, minChars) {
     markDocument(this, className, minChars);
   });
-})();
+}))();

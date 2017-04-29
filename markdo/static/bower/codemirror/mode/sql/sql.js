@@ -1,12 +1,12 @@
-CodeMirror.defineMode("sql", function(config, parserConfig) {
+CodeMirror.defineMode("sql", (config, parserConfig) => {
   "use strict";
 
-  var client         = parserConfig.client || {},
-      atoms          = parserConfig.atoms || {"false": true, "true": true, "null": true},
-      builtin        = parserConfig.builtin || {},
-      keywords       = parserConfig.keywords,
-      operatorChars  = /^[*+\-%<>!=&|~^]/,
-      hooks          = parserConfig.hooks || {};
+  var client         = parserConfig.client || {};
+  var atoms          = parserConfig.atoms || {"false": true, "true": true, "null": true};
+  var builtin        = parserConfig.builtin || {};
+  var keywords       = parserConfig.keywords;
+  var operatorChars  = /^[*+\-%<>!=&|~^]/;
+  var hooks          = parserConfig.hooks || {};
 
   function tokenBase(stream, state) {
     var ch = stream.next();
@@ -57,8 +57,9 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
   }
 
   function tokenLiteral(quote) {
-    return function(stream, state) {
-      var escaped = false, ch;
+    return (stream, state) => {
+      var escaped = false;
+      var ch;
       while ((ch = stream.next()) != null) {
 	if (ch == quote && !escaped) {
 	  state.tokenize = tokenBase;
@@ -90,7 +91,7 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       prev: state.context,
       indent: stream.indentation(),
       col: stream.column(),
-      type: type
+      type
     };
   }
 
@@ -100,11 +101,11 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
   }
 
   return {
-    startState: function() {
+    startState() {
       return {tokenize: tokenBase, context: null};
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       if (stream.sol()) {
 	if (state.context && state.context.align == null)
 	  state.context.align = false;
@@ -127,7 +128,7 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
       return style;
     },
 
-    indent: function(state, textAfter) {
+    indent(state, textAfter) {
       var cx = state.context;
       if (!cx) return CodeMirror.Pass;
       if (cx.align) return cx.col + (textAfter.charAt(0) == cx.type ? 0 : 1);
@@ -136,11 +137,12 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
   };
 });
 
-(function() {
+((() => {
   "use strict";
 
   function hookIdentifier(stream) {
-    var escaped = false, ch;
+    var escaped = false;
+    var ch;
 
     while ((ch = stream.next()) != null) {
       if (ch == "`" && !escaped) return "variable-2";
@@ -183,7 +185,8 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
   var sqlKeywords = "alter and as asc between by count create delete desc distinct drop from having in insert into is join like not on or order select set table union update values where ";
 
   function set(str) {
-    var obj = {}, words = str.split(" ");
+    var obj = {};
+    var words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
     return obj;
   }
@@ -229,4 +232,4 @@ CodeMirror.defineMode("sql", function(config, parserConfig) {
     functions:  set("abs acos add_months ascii asin atan atan2 average bfilename ceil chartorowid chr concat convert cos cosh count decode deref dual dump dup_val_on_index empty error exp false floor found glb greatest hextoraw initcap instr instrb isopen last_day least lenght lenghtb ln lower lpad ltrim lub make_ref max min mod months_between new_time next_day nextval nls_charset_decl_len nls_charset_id nls_charset_name nls_initcap nls_lower nls_sort nls_upper nlssort no_data_found notfound null nvl others power rawtohex reftohex round rowcount rowidtochar rpad rtrim sign sin sinh soundex sqlcode sqlerrm sqrt stddev substr substrb sum sysdate tan tanh to_char to_date to_label to_multi_byte to_number to_single_byte translate true trunc uid upper user userenv variance vsize"),
     builtin:    set("bfile blob character clob dec float int integer mlslabel natural naturaln nchar nclob number numeric nvarchar2 real rowtype signtype smallint string varchar varchar2")
   });
-}());
+})());

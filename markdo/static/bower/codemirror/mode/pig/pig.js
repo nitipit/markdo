@@ -4,27 +4,27 @@
  *	@link 	https://github.com/prasanthj/pig-codemirror-2
  *  This implementation is adapted from PL/SQL mode in CodeMirror 2.
 */
-CodeMirror.defineMode("pig", function(config, parserConfig) {
-	var indentUnit = config.indentUnit,
-		keywords = parserConfig.keywords,
-		builtins = parserConfig.builtins,
-		types = parserConfig.types,
-		multiLineStrings = parserConfig.multiLineStrings;
-	
-	var isOperatorChar = /[*+\-%<>=&?:\/!|]/;
-	
-	function chain(stream, state, f) {
+CodeMirror.defineMode("pig", (config, parserConfig) => {
+    var indentUnit = config.indentUnit;
+    var keywords = parserConfig.keywords;
+    var builtins = parserConfig.builtins;
+    var types = parserConfig.types;
+    var multiLineStrings = parserConfig.multiLineStrings;
+
+    var isOperatorChar = /[*+\-%<>=&?:\/!|]/;
+
+    function chain(stream, state, f) {
 		state.tokenize = f;
 		return f(stream, state);
 	}
-	
-	var type;
-	function ret(tp, style) {
+
+    var type;
+    function ret(tp, style) {
 		type = tp;
 		return style;
 	}
-	
-	function tokenComment(stream, state) {
+
+    function tokenComment(stream, state) {
 		var isEnd = false;
 		var ch;
 		while(ch = stream.next()) {
@@ -36,23 +36,25 @@ CodeMirror.defineMode("pig", function(config, parserConfig) {
 		}
 		return ret("comment", "comment");
 	}
-	
-	function tokenString(quote) {
-		return function(stream, state) {
-			var escaped = false, next, end = false;
-			while((next = stream.next()) != null) {
+
+    function tokenString(quote) {
+		return (stream, state) => {
+            var escaped = false;
+            var next;
+            var end = false;
+            while((next = stream.next()) != null) {
 				if (next == quote && !escaped) {
 					end = true; break;
 				}
 				escaped = !escaped && next == "\\";
 			}
-			if (end || !(escaped || multiLineStrings))
+            if (end || !(escaped || multiLineStrings))
 				state.tokenize = tokenBase;
-			return ret("string", "error");
-		};
+            return ret("string", "error");
+        };
 	}
-	
-	function tokenBase(stream, state) {
+
+    function tokenBase(stream, state) {
 		var ch = stream.next();
 		
 		// is a start of string?
@@ -116,17 +118,17 @@ CodeMirror.defineMode("pig", function(config, parserConfig) {
 			return ret("variable", "pig-word");
 		}
 	}
-	
-	// Interface
-	return {
-		startState: function(basecolumn) {
+
+    // Interface
+    return {
+		startState(basecolumn) {
 			return {
 				tokenize: tokenBase,
 				startOfLine: true
 			};
 		},
 		
-		token: function(stream, state) {
+		token(stream, state) {
 			if(stream.eatSpace()) return null;
 			var style = state.tokenize(stream, state);
 			return style;
@@ -134,12 +136,13 @@ CodeMirror.defineMode("pig", function(config, parserConfig) {
 	};
 });
 
-(function() {
+((() => {
 	function keywords(str) {
-		var obj = {}, words = str.split(" ");
-		for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
- 		return obj;
- 	}
+        var obj = {};
+        var words = str.split(" ");
+        for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
+        return obj;
+    }
 
 	// builtin funcs taken from trunk revision 1303237
 	var pBuiltins = "ABS ACOS ARITY ASIN ATAN AVG BAGSIZE BINSTORAGE BLOOM BUILDBLOOM CBRT CEIL " 
@@ -169,4 +172,4 @@ CodeMirror.defineMode("pig", function(config, parserConfig) {
 	 keywords: keywords(pKeywords),
 	 types: keywords(pTypes)
 	 });
-}());
+})());

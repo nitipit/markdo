@@ -1,10 +1,10 @@
-(function() {
+((() => {
   if (!CodeMirror.modeURL) CodeMirror.modeURL = "../mode/%N/%N.js";
 
   var loading = {};
   function splitCallback(cont, n) {
     var countDown = n;
-    return function() { if (--countDown == 0) cont(); };
+    return () => { if (--countDown == 0) cont(); };
   }
   function ensureDeps(mode, cont) {
     var deps = CodeMirror.modes[mode].dependencies;
@@ -20,7 +20,7 @@
       CodeMirror.requireMode(missing[i], split);
   }
 
-  CodeMirror.requireMode = function(mode, cont) {
+  CodeMirror.requireMode = (mode, cont) => {
     if (typeof mode != "string") mode = mode.name;
     if (CodeMirror.modes.hasOwnProperty(mode)) return ensureDeps(mode, cont);
     if (loading.hasOwnProperty(mode)) return loading[mode].push(cont);
@@ -30,22 +30,24 @@
     var others = document.getElementsByTagName("script")[0];
     others.parentNode.insertBefore(script, others);
     var list = loading[mode] = [cont];
-    var count = 0, poll = setInterval(function() {
+    var count = 0;
+
+    var poll = setInterval(() => {
       if (++count > 100) return clearInterval(poll);
       if (CodeMirror.modes.hasOwnProperty(mode)) {
         clearInterval(poll);
         loading[mode] = null;
-        ensureDeps(mode, function() {
+        ensureDeps(mode, () => {
           for (var i = 0; i < list.length; ++i) list[i]();
         });
       }
     }, 200);
   };
 
-  CodeMirror.autoLoadMode = function(instance, mode) {
+  CodeMirror.autoLoadMode = (instance, mode) => {
     if (!CodeMirror.modes.hasOwnProperty(mode))
-      CodeMirror.requireMode(mode, function() {
+      CodeMirror.requireMode(mode, () => {
         instance.setOption("mode", instance.getOption("mode"));
       });
   };
-}());
+})());

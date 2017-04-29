@@ -3,7 +3,8 @@ function forEach(arr, f) {
 }
 
 function addDoc(cm, width, height) {
-  var content = [], line = "";
+  var content = [];
+  var line = "";
   for (var i = 0; i < width; ++i) line += "x";
   for (var i = 0; i < height; ++i) content.push(line);
   cm.setValue(content.join("\n"));
@@ -11,7 +12,8 @@ function addDoc(cm, width, height) {
 
 function byClassName(elt, cls) {
   if (elt.getElementsByClassName) return elt.getElementsByClassName(cls);
-  var found = [], re = new RegExp("\\b" + cls + "\\b");
+  var found = [];
+  var re = new RegExp("\\b" + cls + "\\b");
   function search(elt) {
     if (elt.nodeType == 3) return;
     if (re.test(elt.className)) found.push(elt);
@@ -24,7 +26,7 @@ function byClassName(elt, cls) {
 
 var ie_lt8 = /MSIE [1-7]\b/.test(navigator.userAgent);
 
-test("core_fromTextArea", function() {
+test("core_fromTextArea", () => {
   var te = document.getElementById("code");
   te.value = "CONTENT";
   var cm = CodeMirror.fromTextArea(te);
@@ -40,7 +42,7 @@ test("core_fromTextArea", function() {
   eq(te.value, "xxx");
 });
 
-testCM("getRange", function(cm) {
+testCM("getRange", cm => {
   eq(cm.getLine(0), "1234");
   eq(cm.getLine(1), "5678");
   eq(cm.getLine(2), null);
@@ -51,7 +53,7 @@ testCM("getRange", function(cm) {
   eq(cm.getRange({line: 1, ch: 2}, {line: 100, ch: 0}), "78");
 }, {value: "1234\n5678"});
 
-testCM("replaceRange", function(cm) {
+testCM("replaceRange", cm => {
   eq(cm.getValue(), "");
   cm.replaceRange("foo\n", {line: 0, ch: 0});
   eq(cm.getValue(), "foo\n");
@@ -65,7 +67,7 @@ testCM("replaceRange", function(cm) {
   eq(cm.lineCount(), 1);
 });
 
-testCM("selection", function(cm) {
+testCM("selection", cm => {
   cm.setSelection({line: 0, ch: 4}, {line: 2, ch: 2});
   is(cm.somethingSelected());
   eq(cm.getSelection(), "11\n222222\n33");
@@ -87,7 +89,7 @@ testCM("selection", function(cm) {
   eqPos(cm.getCursor(true), {line: 1, ch: 2});
 }, {value: "111111\n222222\n333333"});
 
-testCM("lines", function(cm) {
+testCM("lines", cm => {
   eq(cm.getLine(0), "111111");
   eq(cm.getLine(1), "222222");
   eq(cm.getLine(-1), null);
@@ -96,7 +98,7 @@ testCM("lines", function(cm) {
   eq(cm.getValue(), "111111\nabc");
 }, {value: "111111\n222222\n333333"});
 
-testCM("indent", function(cm) {
+testCM("indent", cm => {
   cm.indentLine(1);
   eq(cm.getLine(1), "   blah();");
   cm.setOption("indentUnit", 8);
@@ -108,14 +110,16 @@ testCM("indent", function(cm) {
   eq(cm.getLine(1), "\t\t  blah();");
 }, {value: "if (x) {\nblah();\n}", indentUnit: 3, indentWithTabs: true, tabSize: 8});
 
-test("core_defaults", function() {
-  var olddefaults = CodeMirror.defaults, defs = CodeMirror.defaults = {};
+test("core_defaults", () => {
+  var olddefaults = CodeMirror.defaults;
+  var defs = CodeMirror.defaults = {};
   for (var opt in olddefaults) defs[opt] = olddefaults[opt];
   defs.indentUnit = 5;
   defs.value = "uu";
   defs.enterMode = "keep";
   defs.tabindex = 55;
-  var place = document.getElementById("testground"), cm = CodeMirror(place);
+  var place = document.getElementById("testground");
+  var cm = CodeMirror(place);
   try {
     eq(cm.getOption("indentUnit"), 5);
     cm.setOption("indentUnit", 10);
@@ -130,7 +134,7 @@ test("core_defaults", function() {
   }
 });
 
-testCM("lineInfo", function(cm) {
+testCM("lineInfo", cm => {
   eq(cm.lineInfo(-1), null);
   var lh = cm.setMarker(1, "FOO", "bar");
   var info = cm.lineInfo(1);
@@ -143,7 +147,7 @@ testCM("lineInfo", function(cm) {
   eq(cm.lineInfo(1).markerText, null);
 }, {value: "111111\n222222\n333333"});
 
-testCM("coords", function(cm) {
+testCM("coords", cm => {
   cm.setSize(null, 100);
   addDoc(cm, 32, 200);
   var top = cm.charCoords({line: 0, ch: 0});
@@ -157,12 +161,12 @@ testCM("coords", function(cm) {
   eq(top.x, top2.x);
 });
 
-testCM("coordsChar", function(cm) {
+testCM("coordsChar", cm => {
   addDoc(cm, 35, 70);
   for (var ch = 0; ch <= 35; ch += 5) {
     for (var line = 0; line < 70; line += 5) {
       cm.setCursor(line, ch);
-      var coords = cm.charCoords({line: line, ch: ch});
+      var coords = cm.charCoords({line, ch});
       var pos = cm.coordsChar({x: coords.x, y: coords.y + 1});
       eq(pos.line, line);
       eq(pos.ch, ch);
@@ -170,7 +174,7 @@ testCM("coordsChar", function(cm) {
   }
 });
 
-testCM("posFromIndex", function(cm) {
+testCM("posFromIndex", cm => {
   cm.setValue(
     "This function should\n" +
     "convert a zero based index\n" +
@@ -197,7 +201,7 @@ testCM("posFromIndex", function(cm) {
   }  
 });
 
-testCM("undo", function(cm) {
+testCM("undo", cm => {
   cm.setLine(0, "def");
   eq(cm.historySize().undo, 1);
   cm.undo();
@@ -222,7 +226,7 @@ testCM("undo", function(cm) {
   eq(cm.getValue(), "1\n\n\n2");
 }, {value: "abc"});
 
-testCM("undoMultiLine", function(cm) {
+testCM("undoMultiLine", cm => {
   cm.replaceRange("x", {line:0, ch: 0});
   cm.replaceRange("y", {line:1, ch: 0});
   cm.undo();
@@ -238,7 +242,7 @@ testCM("undoMultiLine", function(cm) {
   eq(cm.getValue(), "abc\ndef\nghi");
 }, {value: "abc\ndef\nghi"});
 
-testCM("markTextSingleLine", function(cm) {
+testCM("markTextSingleLine", cm => {
   forEach([{a: 0, b: 1, c: "", f: 2, t: 5},
            {a: 0, b: 4, c: "", f: 0, t: 2},
            {a: 1, b: 2, c: "x", f: 3, t: 6},
@@ -252,7 +256,7 @@ testCM("markTextSingleLine", function(cm) {
            {a: 4, b: 6, c: "x", f: 3, t: 4},
            {a: 4, b: 8, c: "", f: 3, t: 4},
            {a: 6, b: 6, c: "a", f: 3, t: 6},
-           {a: 8, b: 9, c: "", f: 3, t: 6}], function(test) {
+           {a: 8, b: 9, c: "", f: 3, t: 6}], test => {
     cm.setValue("1234567890");
     var r = cm.markText({line: 0, ch: 3}, {line: 0, ch: 6}, "foo");
     cm.replaceRange(test.c, {line: 0, ch: test.a}, {line: 0, ch: test.b});
@@ -261,7 +265,7 @@ testCM("markTextSingleLine", function(cm) {
   });
 });
 
-testCM("markTextMultiLine", function(cm) {
+testCM("markTextMultiLine", cm => {
   function p(v) { return v && {line: v[0], ch: v[1]}; }
   forEach([{a: [0, 0], b: [0, 5], c: "", f: [0, 0], t: [2, 5]},
            {a: [0, 0], b: [0, 5], c: "foo\n", f: [1, 0], t: [3, 5]},
@@ -277,7 +281,7 @@ testCM("markTextMultiLine", function(cm) {
            {a: [2, 0], b: [2, 3], c: "", f: [0, 5], t: [2, 2]},
            {a: [2, 5], b: [3, 0], c: "a\nb", f: [0, 5], t: [2, 5]},
            {a: [2, 3], b: [3, 0], c: "x", f: [0, 5], t: [2, 3]},
-           {a: [1, 1], b: [1, 9], c: "1\n2\n3", f: [0, 5], t: [4, 5]}], function(test) {
+           {a: [1, 1], b: [1, 9], c: "1\n2\n3", f: [0, 5], t: [4, 5]}], test => {
     cm.setValue("aaaaaaaaaa\nbbbbbbbbbb\ncccccccccc\ndddddddd\n");
     var r = cm.markText({line: 0, ch: 5}, {line: 2, ch: 5}, "CodeMirror-matchingbracket");
     cm.replaceRange(test.c, p(test.a), p(test.b));
@@ -286,36 +290,39 @@ testCM("markTextMultiLine", function(cm) {
   });
 });
 
-testCM("markTextUndo", function(cm) {
-  var marker1, marker2, bookmark;
-  cm.compoundChange(function(){
+testCM("markTextUndo", cm => {
+  var marker1;
+  var marker2;
+  var bookmark;
+  cm.compoundChange(() => {
     marker1 = cm.markText({line: 0, ch: 1}, {line: 0, ch: 3}, "CodeMirror-matchingbracket");
     marker2 = cm.markText({line: 0, ch: 0}, {line: 2, ch: 1}, "CodeMirror-matchingbracket");
     bookmark = cm.setBookmark({line: 1, ch: 5});
   });
-  cm.compoundChange(function(){
+  cm.compoundChange(() => {
     cm.replaceRange("foo", {line: 0, ch: 2});
     cm.replaceRange("bar\baz\bug\n", {line: 2, ch: 0}, {line: 3, ch: 0});
   });
   cm.setValue("");
-  eq(marker1.find(), null); eq(marker2.find(), null); eq(bookmark.find(), null);
+  eq(marker1.find(), null);eq(marker2.find(), null);eq(bookmark.find(), null);
   cm.undo();
   eqPos(bookmark.find(), {line: 1, ch: 5});
   cm.undo();
-  var m1Pos = marker1.find(), m2Pos = marker2.find();
-  eqPos(m1Pos.from, {line: 0, ch: 1}); eqPos(m1Pos.to, {line: 0, ch: 3});
-  eqPos(m2Pos.from, {line: 0, ch: 0}); eqPos(m2Pos.to, {line: 2, ch: 1});
+  var m1Pos = marker1.find();
+  var m2Pos = marker2.find();
+  eqPos(m1Pos.from, {line: 0, ch: 1});eqPos(m1Pos.to, {line: 0, ch: 3});
+  eqPos(m2Pos.from, {line: 0, ch: 0});eqPos(m2Pos.to, {line: 2, ch: 1});
   eqPos(bookmark.find(), {line: 1, ch: 5});
 }, {value: "1234\n56789\n00\n"});
 
-testCM("markClearBetween", function(cm) {
+testCM("markClearBetween", cm => {
   cm.setValue("aaa\nbbb\nccc\nddd\n");
   cm.markText({line: 0, ch: 0}, {line: 2}, "foo");
   cm.replaceRange("aaa\nbbb\nccc", {line: 0, ch: 0}, {line: 2});
   eq(cm.findMarksAt({line: 1, ch: 1}).length, 0);
 });
 
-testCM("bookmark", function(cm) {
+testCM("bookmark", cm => {
   function p(v) { return v && {line: v[0], ch: v[1]}; }
   forEach([{a: [1, 0], b: [1, 1], c: "", d: [1, 4]},
            {a: [1, 1], b: [1, 1], c: "xx", d: [1, 7]},
@@ -324,7 +331,7 @@ testCM("bookmark", function(cm) {
            {a: [1, 5], b: [1, 6], c: "abc", d: [1, 5]},
            {a: [1, 6], b: [1, 8], c: "", d: [1, 5]},
            {a: [1, 4], b: [1, 4], c: "\n\n", d: [3, 1]},
-           {bm: [1, 9], a: [1, 1], b: [1, 1], c: "\n", d: [2, 8]}], function(test) {
+           {bm: [1, 9], a: [1, 1], b: [1, 1], c: "\n", d: [2, 8]}], test => {
     cm.setValue("1234567890\n1234567890\n1234567890");
     var b = cm.setBookmark(p(test.bm) || {line: 1, ch: 5});
     cm.replaceRange(test.c, p(test.a), p(test.b));
@@ -332,14 +339,14 @@ testCM("bookmark", function(cm) {
   });
 });
 
-testCM("bug577", function(cm) {
+testCM("bug577", cm => {
   cm.setValue("a\nb");
   cm.clearHistory();
   cm.setValue("fooooo");
   cm.undo();
 });
 
-testCM("scrollSnap", function(cm) {
+testCM("scrollSnap", cm => {
   cm.setSize(100, 100);
   addDoc(cm, 200, 200);
   cm.setCursor({line: 100, ch: 180});
@@ -354,7 +361,7 @@ testCM("scrollSnap", function(cm) {
   is(info.x == 0 && info.y > info.height - 100, "scrolled clean to bottom");
 });
 
-testCM("selectionPos", function(cm) {
+testCM("selectionPos", cm => {
   cm.setSize(100, 100);
   addDoc(cm, 200, 100);
   cm.setSelection({line: 1, ch: 100}, {line: 98, ch: 100});
@@ -363,7 +370,9 @@ testCM("selectionPos", function(cm) {
   cm.scrollTo(0, 0);
   var selElt = byClassName(cm.getWrapperElement(), "CodeMirror-selected");
   var outer = cm.getWrapperElement().getBoundingClientRect();
-  var sawMiddle, sawTop, sawBottom;
+  var sawMiddle;
+  var sawTop;
+  var sawBottom;
   for (var i = 0, e = selElt.length; i < e; ++i) {
     var box = selElt[i].getBoundingClientRect();
     var atLeft = box.left - outer.left < 30;
@@ -388,12 +397,13 @@ testCM("selectionPos", function(cm) {
   is(sawTop && sawBottom && sawMiddle, "all parts");
 }, null, ie_lt8);
 
-testCM("restoreHistory", function(cm) {
+testCM("restoreHistory", cm => {
   cm.setValue("abc\ndef");
-  cm.compoundChange(function() {cm.setLine(1, "hello");});
-  cm.compoundChange(function() {cm.setLine(0, "goop");});
+  cm.compoundChange(() => {cm.setLine(1, "hello");});
+  cm.compoundChange(() => {cm.setLine(0, "goop");});
   cm.undo();
-  var storedVal = cm.getValue(), storedHist = cm.getHistory();
+  var storedVal = cm.getValue();
+  var storedHist = cm.getHistory();
   if (window.JSON) storedHist = JSON.parse(JSON.stringify(storedHist));
   eq(storedVal, "abc\nhello");
   cm.setValue("");
@@ -403,11 +413,11 @@ testCM("restoreHistory", function(cm) {
   cm.setHistory(storedHist);
   cm.redo();
   eq(cm.getValue(), "goop\nhello");
-  cm.undo(); cm.undo();
+  cm.undo();cm.undo();
   eq(cm.getValue(), "abc\ndef");
 });
 
-testCM("doubleScrollbar", function(cm) {
+testCM("doubleScrollbar", cm => {
   var dummy = document.body.appendChild(document.createElement("p"));
   dummy.style.cssText = "height: 50px; overflow: scroll; width: 50px";
   var scrollbarWidth = dummy.offsetWidth + 1 - dummy.clientWidth;
@@ -418,7 +428,7 @@ testCM("doubleScrollbar", function(cm) {
   is(wrap.offsetWidth - byClassName(wrap, "CodeMirror-lines")[0].offsetWidth <= scrollbarWidth);
 });
 
-testCM("weirdLinebreaks", function(cm) {
+testCM("weirdLinebreaks", cm => {
   cm.setValue("foo\nbar\rbaz\r\nquux\n\rplop");
   is(cm.getValue(), "foo\nbar\nbaz\nquux\n\nplop");
   is(cm.lineCount(), 6);
@@ -426,7 +436,7 @@ testCM("weirdLinebreaks", function(cm) {
   is(cm.lineCount(), 3);
 });
 
-testCM("setSize", function(cm) {
+testCM("setSize", cm => {
   cm.setSize(100, 100);
   is(cm.getWrapperElement().offsetWidth, 100);
   is(cm.getWrapperElement().offsetHeight, 100);
@@ -438,7 +448,7 @@ testCM("setSize", function(cm) {
   is(cm.getScrollerElement().style.height, "40px");
 });
 
-testCM("hiddenLines", function(cm) {
+testCM("hiddenLines", cm => {
   addDoc(cm, 4, 10);
   cm.hideLine(4);
   cm.setCursor({line: 3, ch: 0});
@@ -454,7 +464,7 @@ testCM("hiddenLines", function(cm) {
   eqPos(cm.getCursor(), {line: 5, ch: 2});
 });
 
-testCM("hiddenLinesSelectAll", function(cm) {  // Issue #484
+testCM("hiddenLinesSelectAll", cm => {  // Issue #484
   addDoc(cm, 4, 20);
   for (var i = 0; i < 20; ++i)
     if (i != 10) cm.hideLine(i);
@@ -463,10 +473,12 @@ testCM("hiddenLinesSelectAll", function(cm) {  // Issue #484
   eqPos(cm.getCursor(false), {line: 10, ch: 4});
 });
 
-testCM("wrappingAndResizing", function(cm) {
+testCM("wrappingAndResizing", cm => {
   cm.setSize(null, "auto");
   cm.setOption("lineWrapping", true);
-  var wrap = cm.getWrapperElement(), h0 = wrap.offsetHeight, w = 50;
+  var wrap = cm.getWrapperElement();
+  var h0 = wrap.offsetHeight;
+  var w = 50;
   var doc = "xxx xxx xxx xxx xxx";
   cm.setValue(doc);
   for (var step = 10;; w += step) {
@@ -489,16 +501,17 @@ testCM("wrappingAndResizing", function(cm) {
   cm.replaceRange("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n!\n", {line: 2, ch: 0});
   forEach([{line: 0, ch: doc.length}, {line: 0, ch: doc.length - 1},
            {line: 0, ch: 0}, {line: 1, ch: doc.length}, {line: 1, ch: doc.length - 1}],
-          function(pos) {
+          pos => {
     var coords = cm.charCoords(pos);
     eqPos(pos, cm.coordsChar({x: coords.x + 2, y: coords.y + 2}));
   });
 }, null, ie_lt8);
 
-testCM("measureEndOfLine", function(cm) {
+testCM("measureEndOfLine", cm => {
   cm.setSize(null, "auto");
   var inner = byClassName(cm.getWrapperElement(), "CodeMirror-lines")[0].firstChild;
-  var w = 20, lh = inner.offsetHeight;
+  var w = 20;
+  var lh = inner.offsetHeight;
   for (var step = 10;; w += step) {
     cm.setSize(w);
     if (inner.offsetHeight < 2.5 * lh) {
@@ -514,11 +527,12 @@ testCM("measureEndOfLine", function(cm) {
   eqPos(cm.coordsChar({x: endPos.x, y: endPos.y + 2}), {line: 0, ch: 18});
 }, {mode: "text/html", value: "<!-- foo barrr -->", lineWrapping: true}, ie_lt8);
 
-testCM("scrollVerticallyAndHorizontally", function(cm) {
+testCM("scrollVerticallyAndHorizontally", cm => {
   cm.setSize(100, 100);
   addDoc(cm, 40, 40);
   cm.setCursor(39);
-  var wrap = cm.getWrapperElement(), bar = byClassName(wrap, "CodeMirror-scrollbar")[0];
+  var wrap = cm.getWrapperElement();
+  var bar = byClassName(wrap, "CodeMirror-scrollbar")[0];
   is(bar.offsetHeight < wrap.offsetHeight, "vertical scrollbar limited by horizontal one");
   var cursorBox = byClassName(wrap, "CodeMirror-cursor")[0].getBoundingClientRect();
   var editorBox = wrap.getBoundingClientRect();
@@ -526,8 +540,9 @@ testCM("scrollVerticallyAndHorizontally", function(cm) {
      "bottom line visible");
 }, {gutter: true});
 
-testCM("moveV stuck", function(cm) {
-  var lines = byClassName(cm.getWrapperElement(), "CodeMirror-lines")[0].firstChild, h0 = lines.offsetHeight;
+testCM("moveV stuck", cm => {
+  var lines = byClassName(cm.getWrapperElement(), "CodeMirror-lines")[0].firstChild;
+  var h0 = lines.offsetHeight;
   var val = "fooooooooooooooooooooooooo baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaar\n";
   cm.setValue(val);
   for (var w = 50;; w += 5) {
@@ -539,16 +554,18 @@ testCM("moveV stuck", function(cm) {
   eqPos(cm.getCursor(), {line: 0, ch: 26});
 }, {lineWrapping: true}, ie_lt8);
 
-testCM("clickTab", function(cm) {
-  var p0 = cm.charCoords({line: 0, ch: 0}), p1 = cm.charCoords({line: 0, ch: 1});
+testCM("clickTab", cm => {
+  var p0 = cm.charCoords({line: 0, ch: 0});
+  var p1 = cm.charCoords({line: 0, ch: 1});
   eqPos(cm.coordsChar({x: p0.x + 5, y: p0.y + 5}), {line: 0, ch: 0});
   eqPos(cm.coordsChar({x: p1.x - 5, y: p1.y + 5}), {line: 0, ch: 1});
 }, {value: "\t\n\n", lineWrapping: true, tabSize: 8});
 
-testCM("verticalScroll", function(cm) {
+testCM("verticalScroll", cm => {
   cm.setSize(100, 200);
   cm.setValue("foo\nbar\nbaz\n");
-  var sc = cm.getScrollerElement(), baseWidth = sc.scrollWidth;
+  var sc = cm.getScrollerElement();
+  var baseWidth = sc.scrollWidth;
   cm.setLine(0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaah");
   is(sc.scrollWidth > baseWidth, "scrollbar present");
   cm.setLine(0, "foo");
@@ -562,18 +579,18 @@ testCM("verticalScroll", function(cm) {
   is(sc.scrollWidth > baseWidth, "but still present");
 });
 
-testCM("extraKeys", function(cm) {
+testCM("extraKeys", cm => {
   var outcome;
   function fakeKey(expected, code, props) {
     if (typeof code == "string") code = code.charCodeAt(0);
-    var e = {type: "keydown", keyCode: code, preventDefault: function(){}, stopPropagation: function(){}};
+    var e = {type: "keydown", keyCode: code, preventDefault() {}, stopPropagation() {}};
     if (props) for (var n in props) e[n] = props[n];
     outcome = null;
     cm.triggerOnKeyDown(e);
     eq(outcome, expected);
   }
-  CodeMirror.commands.testCommand = function() {outcome = "tc";};
-  CodeMirror.commands.goTestCommand = function() {outcome = "gtc";};
+  CodeMirror.commands.testCommand = () => {outcome = "tc";};
+  CodeMirror.commands.goTestCommand = () => {outcome = "gtc";};
   cm.setOption("extraKeys", {"Shift-X": function() {outcome = "sx";},
                              "X": function() {outcome = "x";},
                              "Ctrl-Alt-U": function() {outcome = "cau";},
@@ -592,7 +609,7 @@ testCM("extraKeys", function(cm) {
   fakeKey(null, 9);
 });
 
-testCM("wordMovementCommands", function(cm) {
+testCM("wordMovementCommands", cm => {
   cm.execCommand("goWordLeft");
   eqPos(cm.getCursor(), {line: 0, ch: 0});
   cm.execCommand("goWordRight"); cm.execCommand("goWordRight");
@@ -613,7 +630,7 @@ testCM("wordMovementCommands", function(cm) {
   eqPos(cm.getCursor(), {line: 2, ch: 0});
 }, {value: "this is (the) firstline.\na foo12\u00e9\u00f8\u00d7bar\n"});
 
-testCM("charMovementCommands", function(cm) {
+testCM("charMovementCommands", cm => {
   cm.execCommand("goCharLeft"); cm.execCommand("goColumnLeft");
   eqPos(cm.getCursor(), {line: 0, ch: 0});
   cm.execCommand("goCharRight"); cm.execCommand("goCharRight");
@@ -638,7 +655,7 @@ testCM("charMovementCommands", function(cm) {
   eqPos(cm.getCursor(), {line: 2, ch: 0});
 }, {value: "line1\n ine2\n"});
 
-testCM("verticalMovementCommands", function(cm) {
+testCM("verticalMovementCommands", cm => {
   cm.execCommand("goLineUp");
   eqPos(cm.getCursor(), {line: 0, ch: 0});
   cm.execCommand("goLineDown");
@@ -660,7 +677,7 @@ testCM("verticalMovementCommands", function(cm) {
   eqPos(cm.getCursor(), {line: 0, ch: 0});
 }, {value: "line1\nlong long line2\nline3\n\nline5\n"});
 
-testCM("verticalMovementCommandsWrapping", function(cm) {
+testCM("verticalMovementCommandsWrapping", cm => {
   cm.setSize(120);
   cm.setCursor({line: 0, ch: 5});
   cm.execCommand("goLineDown");

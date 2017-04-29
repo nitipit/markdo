@@ -1,6 +1,6 @@
-$(document).ready(function(){
+$(document).ready(() => {
   module("testProcessingInstructions");
-  test("testProcessingInstructions", function() {
+  test("testProcessingInstructions", () => {
     expect(1);
 
     var input = 'data(<?target content?>) instance of xs:string';

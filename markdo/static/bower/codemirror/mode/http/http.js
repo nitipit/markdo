@@ -1,4 +1,4 @@
-CodeMirror.defineMode("http", function() {
+CodeMirror.defineMode("http", () => {
   function failFirstLine(stream, state) {
     stream.skipToEnd();
     state.cur = header;
@@ -79,17 +79,17 @@ CodeMirror.defineMode("http", function() {
   }
 
   return {
-    token: function(stream, state) {
+    token(stream, state) {
       var cur = state.cur;
       if (cur != header && cur != body && stream.eatSpace()) return null;
       return cur(stream, state);
     },
 
-    blankLine: function(state) {
+    blankLine(state) {
       state.cur = body;
     },
 
-    startState: function() {
+    startState() {
       return {cur: start};
     }
   };

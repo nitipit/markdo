@@ -1,4 +1,7 @@
-var tests = [], debug = null, debugUsed = new Array(), allNames = [];
+var tests = [];
+var debug = null;
+var debugUsed = new Array();
+var allNames = [];
 
 function Failure(why) {this.message = why;}
 
@@ -19,12 +22,13 @@ function test(name, run, expectedFail) {
   }
   allNames.push(name);
   // Add test
-  tests.push({name: name, func: run, expectedFail: expectedFail});
+  tests.push({name, func: run, expectedFail});
   return name;
 }
 function testCM(name, run, opts, expectedFail) {
-  return test("core_" + name, function() {
-    var place = document.getElementById("testground"), cm = CodeMirror(place, opts);
+  return test("core_" + name, () => {
+    var place = document.getElementById("testground");
+    var cm = CodeMirror(place, opts);
     var successful = false;
     try {
       run(cm);
@@ -59,7 +63,9 @@ function runTests(callback) {
       running = false;
       return callback("done");
     }
-    var test = tests[i], expFail = test.expectedFail, startTime = +new Date;
+    var test = tests[i];
+    var expFail = test.expectedFail;
+    var startTime = +new Date;
     if (debug !== null) {
       var debugIndex = indexOf(debug, test.name);
       if (debugIndex !== -1) {
@@ -101,7 +107,7 @@ function runTests(callback) {
         totalTime = 0;
         delay = 50;
       }
-      setTimeout(function(){step(i + 1);}, delay);
+      setTimeout(() => {step(i + 1);}, delay);
     } else { // Quit tests
       running = false;
       return null;

@@ -1,4 +1,4 @@
-CodeMirror.defineMode('shell', function(config) {
+CodeMirror.defineMode('shell', config => {
 
   var words = {};
   function define(style, string) {
@@ -64,8 +64,10 @@ CodeMirror.defineMode('shell', function(config) {
   }
 
   function tokenString(quote) {
-    return function(stream, state) {
-      var next, end = false, escaped = false;
+    return (stream, state) => {
+      var next;
+      var end = false;
+      var escaped = false;
       while ((next = stream.next()) != null) {
         if (next === quote && !escaped) {
           end = true;
@@ -86,9 +88,10 @@ CodeMirror.defineMode('shell', function(config) {
     };
   };
 
-  var tokenDollar = function(stream, state) {
+  var tokenDollar = (stream, state) => {
     if (state.tokens.length > 1) stream.eat('$');
-    var ch = stream.next(), hungry = /\w/;
+    var ch = stream.next();
+    var hungry = /\w/;
     if (ch === '{') hungry = /[^}]/;
     if (ch === '(') {
       state.tokens[0] = tokenString(')');
@@ -107,8 +110,8 @@ CodeMirror.defineMode('shell', function(config) {
   };
 
   return {
-    startState: function() {return {tokens:[]};},
-    token: function(stream, state) {
+    startState() {return {tokens:[]};},
+    token(stream, state) {
       if (stream.eatSpace()) return null;
       return tokenize(stream, state);
     }

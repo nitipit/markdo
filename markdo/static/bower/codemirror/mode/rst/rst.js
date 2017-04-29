@@ -1,4 +1,4 @@
-CodeMirror.defineMode('rst', function(config, options) {
+CodeMirror.defineMode('rst', (config, options) => {
     function setState(state, fn, ctx) {
         state.fn = fn;
         setCtx(state, ctx);
@@ -58,7 +58,9 @@ CodeMirror.defineMode('rst', function(config, options) {
     var reExamples = /^\s+(>>>|In \[\d+\]:)\s/;
 
     function normal(stream, state) {
-        var ch, sol, i;
+        var ch;
+        var sol;
+        var i;
 
         if (stream.eat(/\\/)) {
             ch = stream.next();
@@ -93,7 +95,7 @@ CodeMirror.defineMode('rst', function(config, options) {
                 var mode = verbatimMode;
 
                 setState(state, verbatim, {
-                    mode: mode,
+                    mode,
                     local: mode.startState()
                 });
             }
@@ -108,7 +110,7 @@ CodeMirror.defineMode('rst', function(config, options) {
                 var mode = pythonMode;
 
                 setState(state, verbatim, {
-                    mode: mode,
+                    mode,
                     local: mode.startState()
                 });
 
@@ -151,18 +153,18 @@ CodeMirror.defineMode('rst', function(config, options) {
                 }
 
                 setState(state, inline, {
-                    ch: ch,
+                    ch,
                     wide: false,
                     prev: null,
-                    token: token
+                    token
                 });
 
                 return token;
             }
 
             if (ch === '*' || ch === '`') {
-                var orig = ch,
-                    wide = false;
+                var orig = ch;
+                var wide = false;
 
                 ch = stream.next();
 
@@ -182,9 +184,9 @@ CodeMirror.defineMode('rst', function(config, options) {
 
                     setState(state, inline, {
                         ch: orig,               // inline() has to know what to search for
-                        wide: wide,             // are we looking for `ch` or `chch`
+                        wide,             // are we looking for `ch` or `chch`
                         prev: null,             // terminator must not be preceeded with whitespace
-                        token: token            // I don't want to recompute this all the time
+                        token            // I don't want to recompute this all the time
                     });
 
                     return token;
@@ -197,8 +199,8 @@ CodeMirror.defineMode('rst', function(config, options) {
     }
 
     function inline(stream, state) {
-        var ch = stream.next(),
-            token = state.ctx.token;
+        var ch = stream.next();
+        var token = state.ctx.token;
 
         function finish(ch) {
             state.ctx.prev = ch;
@@ -308,15 +310,15 @@ CodeMirror.defineMode('rst', function(config, options) {
     }
 
     return {
-        startState: function() {
+        startState() {
             return {fn: normal, ctx: {}};
         },
 
-        copyState: function(state) {
+        copyState(state) {
             return {fn: state.fn, ctx: state.ctx};
         },
 
-        token: function(stream, state) {
+        token(stream, state) {
             var token = state.fn(stream, state);
             return token;
         }

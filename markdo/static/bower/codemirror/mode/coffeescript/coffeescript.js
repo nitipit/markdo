@@ -2,7 +2,7 @@
  * Link to the project's GitHub page:
  * https://github.com/pickhardt/coffeescript-codemirror-mode
  */
-CodeMirror.defineMode('coffeescript', function(conf) {
+CodeMirror.defineMode('coffeescript', conf => {
     var ERRORCLASS = 'error';
 
     function wordRegexp(words) {
@@ -223,7 +223,7 @@ CodeMirror.defineMode('coffeescript', function(conf) {
         }
         state.scopes.unshift({
             offset: indentUnit,
-            type: type
+            type
         });
     }
 
@@ -309,7 +309,7 @@ CodeMirror.defineMode('coffeescript', function(conf) {
     }
 
     var external = {
-        startState: function(basecolumn) {
+        startState(basecolumn) {
             return {
               tokenize: tokenBase,
               scopes: [{offset:basecolumn || 0, type:'coffee'}],
@@ -319,10 +319,10 @@ CodeMirror.defineMode('coffeescript', function(conf) {
           };
         },
 
-        token: function(stream, state) {
+        token(stream, state) {
             var style = tokenLexer(stream, state);
 
-            state.lastToken = {style:style, content: stream.current()};
+            state.lastToken = {style, content: stream.current()};
 
             if (stream.eol() && stream.lambda) {
                 state.lambda = false;
@@ -331,7 +331,7 @@ CodeMirror.defineMode('coffeescript', function(conf) {
             return style;
         },
 
-        indent: function(state, textAfter) {
+        indent(state, textAfter) {
             if (state.tokenize != tokenBase) {
                 return 0;
             }

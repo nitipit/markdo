@@ -1,5 +1,5 @@
 // TODO number prefixes
-(function() {
+((() => {
   // Really primitive kill-ring implementation.
   var killRing = [];
   function addToRing(str) {
@@ -27,4 +27,4 @@
     "Ctrl-S": "save", "Ctrl-W": "save", "S": "saveAll", "F": "open", "U": "undo", "K": "close",
     auto: "emacs", nofallthrough: true
   };
-})();
+}))();

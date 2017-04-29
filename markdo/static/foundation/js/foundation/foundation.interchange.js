@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined) {
+;((($, window, document, undefined) => {
   'use strict';
 
   Foundation.libs.interchange = {
@@ -32,7 +32,7 @@
       },
 
       directives : {
-        replace: function (el, path, trigger) {
+        replace(el, path, trigger) {
           // The trigger argument, if called within the directive, fires
           // an event named after the directive on the element, passing
           // any parameters along to the event that you pass to trigger.
@@ -57,7 +57,7 @@
 
           if (last_path == path) return;
 
-          return $.get(path, function (response) {
+          return $.get(path, response => {
             el.html(response);
             el.data('interchange-last-path', path);
             trigger();
@@ -67,7 +67,7 @@
       }
     },
 
-    init : function (scope, method, options) {
+    init(scope, method, options) {
       Foundation.inherit(this, 'throttle');
 
       this.data_attr = 'data-' + this.settings.load_attr;
@@ -78,19 +78,19 @@
       this.load('nodes');
     },
 
-    events : function () {
+    events() {
       var self = this;
 
       $(window)
         .off('.interchange')
-        .on('resize.fndtn.interchange', self.throttle(function () {
+        .on('resize.fndtn.interchange', self.throttle(() => {
           self.resize.call(self);
         }, 50));
 
       return this;
     },
 
-    resize : function () {
+    resize() {
       var cache = this.cache;
 
       if(!this.images_loaded || !this.nodes_loaded) {
@@ -119,21 +119,22 @@
 
     },
 
-    results : function (uuid, scenarios) {
+    results(uuid, scenarios) {
       var count = scenarios.length;
 
       if (count > 0) {
         var el = this.S('[data-uuid="' + uuid + '"]');
 
         for (var i = count - 1; i >= 0; i--) {
-          var mq, rule = scenarios[i][2];
+          var mq;
+          var rule = scenarios[i][2];
           if (this.settings.named_queries.hasOwnProperty(rule)) {
             mq = matchMedia(this.settings.named_queries[rule]);
           } else {
             mq = matchMedia(rule);
           }
           if (mq.matches) {
-            return {el: el, scenario: scenarios[i]};
+            return {el, scenario: scenarios[i]};
           }
         }
       }
@@ -141,7 +142,7 @@
       return false;
     },
 
-    load : function (type, force_update) {
+    load(type, force_update) {
       if (typeof this['cached_' + type] === 'undefined' || force_update) {
         this['update_' + type]();
       }
@@ -149,11 +150,11 @@
       return this['cached_' + type];
     },
 
-    update_images : function () {
-      var images = this.S('img[' + this.data_attr + ']'),
-          count = images.length,
-          loaded_count = 0,
-          data_attr = this.data_attr;
+    update_images() {
+      var images = this.S('img[' + this.data_attr + ']');
+      var count = images.length;
+      var loaded_count = 0;
+      var data_attr = this.data_attr;
 
       this.cache = {};
       this.cached_images = [];
@@ -178,11 +179,11 @@
       return this;
     },
 
-    update_nodes : function () {
-      var nodes = this.S('[' + this.data_attr + ']').not('img'),
-          count = nodes.length,
-          loaded_count = 0,
-          data_attr = this.data_attr;
+    update_nodes() {
+      var nodes = this.S('[' + this.data_attr + ']').not('img');
+      var count = nodes.length;
+      var loaded_count = 0;
+      var data_attr = this.data_attr;
 
       this.cached_nodes = [];
       // Set nodes_loaded to true if there are no nodes
@@ -207,7 +208,7 @@
       return this;
     },
 
-    enhance : function (type) {
+    enhance(type) {
       var count = this['cached_' + type].length;
 
       for (var i = count - 1; i >= 0; i--) {
@@ -217,11 +218,11 @@
       return $(window).trigger('resize');
     },
 
-    parse_params : function (path, directive, mq) {
+    parse_params(path, directive, mq) {
       return [this.trim(path), this.convert_directive(directive), this.trim(mq)];
     },
 
-    convert_directive : function (directive) {
+    convert_directive(directive) {
       var trimmed = this.trim(directive);
 
       if (trimmed.length > 0) {
@@ -231,18 +232,20 @@
       return 'replace';
     },
 
-    object : function(el) {
-      var raw_arr = this.parse_data_attr(el),
-          scenarios = [], count = raw_arr.length;
+    object(el) {
+      var raw_arr = this.parse_data_attr(el);
+      var scenarios = [];
+      var count = raw_arr.length;
 
       if (count > 0) {
         for (var i = count - 1; i >= 0; i--) {
           var split = raw_arr[i].split(/\((.*?)(\))$/);
 
           if (split.length > 1) {
-            var cached_split = split[0].split(','),
-                params = this.parse_params(cached_split[0],
-                  cached_split[1], split[1]);
+            var cached_split = split[0].split(',');
+
+            var params = this.parse_params(cached_split[0],
+              cached_split[1], split[1]);
 
             scenarios.push(params);
           }
@@ -252,7 +255,7 @@
       return this.store(el, scenarios);
     },
 
-    uuid : function (separator) {
+    uuid(separator) {
       var delim = separator || "-";
 
       function S4() {
@@ -263,9 +266,9 @@
         + delim + S4() + delim + S4() + S4() + S4());
     },
 
-    store : function (el, scenarios) {
-      var uuid = this.uuid(),
-          current_uuid = el.data('uuid');
+    store(el, scenarios) {
+      var uuid = this.uuid();
+      var current_uuid = el.data('uuid');
 
       if (this.cache[current_uuid]) return this.cache[current_uuid];
 
@@ -274,7 +277,7 @@
       return this.cache[uuid] = scenarios;
     },
 
-    trim : function(str) {
+    trim(str) {
       if (typeof str === 'string') {
         return $.trim(str);
       }
@@ -282,9 +285,10 @@
       return str;
     },
 
-    parse_data_attr : function (el) {
-      var raw = el.data(this.settings.load_attr).split(/\[(.*?)\]/),
-          count = raw.length, output = [];
+    parse_data_attr(el) {
+      var raw = el.data(this.settings.load_attr).split(/\[(.*?)\]/);
+      var count = raw.length;
+      var output = [];
 
       for (var i = count - 1; i >= 0; i--) {
         if (raw[i].replace(/[\W\d]+/, '').length > 4) {
@@ -295,11 +299,11 @@
       return output;
     },
 
-    reflow : function () {
+    reflow() {
       this.load('images', true);
       this.load('nodes', true);
     }
 
   };
 
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));

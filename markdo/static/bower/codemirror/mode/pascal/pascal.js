@@ -1,6 +1,7 @@
-CodeMirror.defineMode("pascal", function(config) {
+CodeMirror.defineMode("pascal", config => {
   function words(str) {
-    var obj = {}, words = str.split(" ");
+    var obj = {};
+    var words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
     return obj;
   }
@@ -50,8 +51,10 @@ CodeMirror.defineMode("pascal", function(config) {
   }
 
   function tokenString(quote) {
-    return function(stream, state) {
-      var escaped = false, next, end = false;
+    return (stream, state) => {
+      var escaped = false;
+      var next;
+      var end = false;
       while ((next = stream.next()) != null) {
         if (next == quote && !escaped) {end = true; break;}
         escaped = !escaped && next == "\\";
@@ -62,7 +65,8 @@ CodeMirror.defineMode("pascal", function(config) {
   }
 
   function tokenComment(stream, state) {
-    var maybeEnd = false, ch;
+    var maybeEnd = false;
+    var ch;
     while (ch = stream.next()) {
       if (ch == ")" && maybeEnd) {
         state.tokenize = null;
@@ -76,11 +80,11 @@ CodeMirror.defineMode("pascal", function(config) {
   // Interface
 
   return {
-    startState: function(basecolumn) {
+    startState(basecolumn) {
       return {tokenize: null};
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       if (stream.eatSpace()) return null;
       var style = (state.tokenize || tokenBase)(stream, state);
       if (style == "comment" || style == "meta") return style;

@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined) {
+;((($, window, document, undefined) => {
   'use strict';
 
   Foundation.libs.magellan = {
@@ -11,7 +11,7 @@
       threshold: 0
     },
 
-    init : function (scope, method, options) {
+    init(scope, method, options) {
       this.fixed_magellan = $("[data-magellan-expedition]");
       this.magellan_placeholder = $('<div></div>').css({
         height: this.fixed_magellan.outerHeight(true)
@@ -22,24 +22,25 @@
       this.events();
     },
 
-    events : function () {
+    events() {
       var self = this;
 
       $(this.scope)
         .off('.magellan')
         .on('arrival.fndtn.magellan', '[data-magellan-arrival]', function (e) {
-          var $destination = $(this),
-              $expedition = $destination.closest('[data-magellan-expedition]'),
-              active_class = $expedition.attr('data-magellan-active-class')
-                || self.settings.active_class;
+        var $destination = $(this);
+        var $expedition = $destination.closest('[data-magellan-expedition]');
 
-            $destination
-              .closest('[data-magellan-expedition]')
-              .find('[data-magellan-arrival]')
-              .not($destination)
-              .removeClass(active_class);
-            $destination.addClass(active_class);
-        });
+        var active_class = $expedition.attr('data-magellan-active-class')
+          || self.settings.active_class;
+
+        $destination
+          .closest('[data-magellan-expedition]')
+          .find('[data-magellan-arrival]')
+          .not($destination)
+          .removeClass(active_class);
+        $destination.addClass(active_class);
+      });
 
       this.fixed_magellan
         .off('.magellan')
@@ -50,10 +51,10 @@
 
       $(window)
         .off('.magellan')
-        .on('resize.fndtn.magellan', function() {
+        .on('resize.fndtn.magellan', () => {
           this.fixed_magellan.trigger('update-position');
-        }.bind(this))
-        .on('scroll.fndtn.magellan', function() {
+        })
+        .on('scroll.fndtn.magellan', () => {
           var windowScrollTop = $(window).scrollTop();
           self.fixed_magellan.each(function() {
             var $expedition = $(this);
@@ -86,15 +87,15 @@
 
 
       if (this.last_destination.length > 0) {
-        $(window).on('scroll.fndtn.magellan', function (e) {
-          var windowScrollTop = $(window).scrollTop(),
-              scrolltopPlusHeight = windowScrollTop + $(window).height(),
-              lastDestinationTop = Math.ceil(self.last_destination.offset().top);
+        $(window).on('scroll.fndtn.magellan', e => {
+          var windowScrollTop = $(window).scrollTop();
+          var scrolltopPlusHeight = windowScrollTop + $(window).height();
+          var lastDestinationTop = Math.ceil(self.last_destination.offset().top);
 
           $('[data-magellan-destination]').each(function () {
-            var $destination = $(this),
-                destination_name = $destination.attr('data-magellan-destination'),
-                topOffset = $destination.offset().top - $destination.outerHeight(true) - windowScrollTop;
+            var $destination = $(this);
+            var destination_name = $destination.attr('data-magellan-destination');
+            var topOffset = $destination.offset().top - $destination.outerHeight(true) - windowScrollTop;
             if (topOffset <= self.settings.threshold) {
               $("[data-magellan-arrival='" + destination_name + "']").trigger('arrival');
             }
@@ -107,24 +108,24 @@
       }
     },
 
-    set_threshold : function () {
+    set_threshold() {
       if (typeof this.settings.threshold !== 'number') {
         this.settings.threshold = (this.fixed_magellan.length > 0) ?
           this.fixed_magellan.outerHeight(true) : 0;
       }
     },
 
-    set_active_class : function (options) {
+    set_active_class(options) {
       if (options && options.active_class && typeof options.active_class === 'string') {
         this.settings.active_class = options.active_class;
       }
     },
 
-    off : function () {
+    off() {
       $(this.scope).off('.fndtn.magellan');
       $(window).off('.fndtn.magellan');
     },
 
-    reflow : function () {}
+    reflow() {}
   };
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));
