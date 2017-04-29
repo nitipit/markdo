@@ -1,4 +1,4 @@
-CodeMirror.defineMode("diff", function() {
+CodeMirror.defineMode("diff", () => {
 
   var TOKEN_NAMES = {
     '+': 'positive',
@@ -7,7 +7,7 @@ CodeMirror.defineMode("diff", function() {
   };
 
   return {
-    token: function(stream) {
+    token(stream) {
       var tw_pos = stream.string.search(/[\t ]+?$/);
 
       if (!stream.sol() || tw_pos === 0) {

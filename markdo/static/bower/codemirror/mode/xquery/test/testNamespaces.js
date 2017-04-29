@@ -1,11 +1,11 @@
-$(document).ready(function(){
+$(document).ready(() => {
   module("test namespaces");
 
 // --------------------------------------------------------------------------------
 // this test is based on this:
 //http://mbrevoort.github.com/CodeMirror2/#!exprSeqTypes/PrologExpr/VariableProlog/ExternalVariablesWith/K2-ExternalVariablesWith-10.xq
 // --------------------------------------------------------------------------------
-  test("test namespaced variable", function() {
+  test("test namespaced variable", () => {
     expect(1);
 
     var input = 'declare namespace e = "http://example.com/ANamespace";\
@@ -26,7 +26,7 @@ declare variable $e:exampleComThisVarIsNotRecognized as element(*) external;';
 // this test is based on:
 // http://mbrevoort.github.com/CodeMirror2/#!Basics/EQNames/eqname-002.xq  
 // --------------------------------------------------------------------------------
-  test("test EQName variable", function() {
+  test("test EQName variable", () => {
     expect(1);
 
     var input = 'declare variable $"http://www.example.com/ns/my":var := 12;\
@@ -46,7 +46,7 @@ declare variable $e:exampleComThisVarIsNotRecognized as element(*) external;';
 // this test is based on:
 // http://mbrevoort.github.com/CodeMirror2/#!Basics/EQNames/eqname-003.xq
 // --------------------------------------------------------------------------------
-  test("test EQName function", function() {
+  test("test EQName function", () => {
     expect(1);
 
     var input = 'declare function "http://www.example.com/ns/my":fn ($a as xs:integer) as xs:integer {\
@@ -68,7 +68,7 @@ declare variable $e:exampleComThisVarIsNotRecognized as element(*) external;';
 // this test is based on:
 // http://mbrevoort.github.com/CodeMirror2/#!Basics/EQNames/eqname-003.xq
 // --------------------------------------------------------------------------------
-  test("test EQName function with single quotes", function() {
+  test("test EQName function with single quotes", () => {
     expect(1);
 
     var input = 'declare function \'http://www.example.com/ns/my\':fn ($a as xs:integer) as xs:integer {\

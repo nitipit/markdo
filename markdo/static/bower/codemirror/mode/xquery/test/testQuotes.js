@@ -1,6 +1,6 @@
-  $(document).ready(function(){
+  $(document).ready(() => {
     module("testQuoteEscape");
-    test("testQuoteEscapeDouble", function() {
+    test("testQuoteEscapeDouble", () => {
       expect(1);
 
       var input = 'let $rootfolder := "c:\\builds\\winnt\\HEAD\\qa\\scripts\\"\

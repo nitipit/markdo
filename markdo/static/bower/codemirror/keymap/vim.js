@@ -50,7 +50,7 @@
  *  8. Set up Vim to work as a keymap for CodeMirror.
  */
 
-(function() {
+((() => {
   'use strict';
 
   var defaultKeymap = [
@@ -231,11 +231,12 @@
     { keys: [':'], type: 'ex' }
   ];
 
-  var Vim = function() {
+  var Vim = () => {
     var alphabetRegex = /[A-Za-z]/;
     var numberRegex = /[\d]/;
     var whiteSpaceRegex = /\s/;
-    var wordRegexp = [(/\w/), (/[^\w\s]/)], bigWordRegexp = [(/\S/)];
+    var wordRegexp = [(/\w/), (/[^\w\s]/)];
+    var bigWordRegexp = [(/\S/)];
     function makeKeyRange(start, size) {
       var keys = [];
       for (var i = start; i < start + size; i++) {
@@ -332,30 +333,30 @@
     }
 
     var vimApi= {
-      buildKeyMap: function() {
+      buildKeyMap() {
         // TODO: Convert keymap into dictionary format for fast lookup.
       },
       // Testing hook, though it might be useful to expose the register
       // controller anyways.
-      getRegisterController: function() {
+      getRegisterController() {
         return getVimGlobalState().registerController;
       },
       // Testing hook.
-      clearVimGlobalState_: function() {
+      clearVimGlobalState_() {
         vimGlobalState = null;
       },
-      map: function(lhs, rhs) {
+      map(lhs, rhs) {
         // Add user defined key bindings.
         exCommandDispatcher.map(lhs, rhs);
       },
       // Initializes vim state variable on the CodeMirror object. Should only be
       // called lazily by handleKey or for testing.
-      maybeInitState: function(cm) {
+      maybeInitState(cm) {
         getVimState(cm);
       },
       // This is the outermost function called by CodeMirror, after keys have
       // been mapped to their Vim equivalents.
-      handleKey: function(cm, key) {
+      handleKey(cm, key) {
         var command;
         var vim = getVimState(cm);
         if (key == 'Esc') {
@@ -447,11 +448,11 @@
       }
     }
     Register.prototype = {
-      set: function(text, linewise) {
+      set(text, linewise) {
         this.text = text;
         this.linewise = !!linewise;
       },
-      append: function(text, linewise) {
+      append(text, linewise) {
         // if this register has ever been set to linewise, use linewise.
         if (linewise || this.linewise) {
           this.text += '\n' + text;
@@ -460,11 +461,11 @@
           this.text += text;
         }
       },
-      clear: function() {
+      clear() {
         this.text = '';
         this.linewise = false;
       },
-      toString: function() { return this.text; }
+      toString() { return this.text; }
     };
 
     /*
@@ -480,7 +481,7 @@
       this.unamedRegister = registers['\"'] = new Register();
     }
     RegisterController.prototype = {
-      pushText: function(registerName, operator, text, linewise) {
+      pushText(registerName, operator, text, linewise) {
         // Lowercase and uppercase registers refer to the same register.
         // Uppercase just means append.
         var register = this.isValidRegister(registerName) ?
@@ -525,7 +526,7 @@
       },
       // Gets the register named @name.  If one of @name doesn't already exist,
       // create it.  If @name is invalid, return the unamedRegister.
-      getRegister: function(name) {
+      getRegister(name) {
         if (!this.isValidRegister(name)) {
           return this.unamedRegister;
         }
@@ -535,10 +536,10 @@
         }
         return this.registers[name];
       },
-      isValidRegister: function(name) {
+      isValidRegister(name) {
         return name && inArray(name, validRegisters);
       },
-      shiftNumericRegisters_: function() {
+      shiftNumericRegisters_() {
         for (var i = 9; i >= 2; i--) {
           this.registers[i] = this.getRegister('' + (i - 1));
         }
@@ -546,7 +547,7 @@
     };
 
     var commandDispatcher = {
-      matchCommand: function(key, keyMap, vim) {
+      matchCommand(key, keyMap, vim) {
         var inputState = vim.inputState;
         var keys = inputState.keyBuffer.concat(key);
         for (var i = 0; i < keyMap.length; i++) {
@@ -577,7 +578,7 @@
         inputState.keyBuffer = [];
         return null;
       },
-      processCommand: function(cm, vim, command) {
+      processCommand(cm, vim, command) {
         switch (command.type) {
           case 'motion':
             this.processMotion(cm, vim, command);
@@ -602,12 +603,12 @@
             break;
         }
       },
-      processMotion: function(cm, vim, command) {
+      processMotion(cm, vim, command) {
         vim.inputState.motion = command.motion;
         vim.inputState.motionArgs = copyArgs(command.motionArgs);
         this.evalInput(cm, vim);
       },
-      processOperator: function(cm, vim, command) {
+      processOperator(cm, vim, command) {
         var inputState = vim.inputState;
         if (inputState.operator) {
           if (inputState.operator == command.operator) {
@@ -629,7 +630,7 @@
           this.evalInput(cm, vim);
         }
       },
-      processOperatorMotion: function(cm, vim, command) {
+      processOperatorMotion(cm, vim, command) {
         var visualMode = vim.visualMode;
         var operatorMotionArgs = copyArgs(command.operatorMotionArgs);
         if (operatorMotionArgs) {
@@ -643,7 +644,7 @@
           this.processMotion(cm, vim, command);
         }
       },
-      processAction: function(cm, vim, command) {
+      processAction(cm, vim, command) {
         var inputState = vim.inputState;
         var repeat = inputState.getRepeat();
         var repeatIsExplicit = !!repeat;
@@ -668,7 +669,7 @@
         vim.lastMotion = null,
         actions[command.action](cm, actionArgs, vim);
       },
-      processSearch: function(cm, vim, command) {
+      processSearch(cm, vim, command) {
         if (!cm.getSearchCursor) {
           // Search depends on SearchCursor.
           return;
@@ -716,7 +717,7 @@
             break;
         }
       },
-      processEx: function(cm, vim, command) {
+      processEx(cm, vim, command) {
         function onPromptClose(input) {
           exCommandDispatcher.processCommand(cm, input);
         }
@@ -731,7 +732,7 @@
           }
         }
       },
-      evalInput: function(cm, vim) {
+      evalInput(cm, vim) {
         // If the motion comand is set, execute both the operator and motion.
         // Otherwise return.
         var inputState = vim.inputState;
@@ -877,32 +878,32 @@
      */
     // All of the functions below return Cursor objects.
     var motions = {
-      expandToLine: function(cm, motionArgs) {
+      expandToLine(cm, motionArgs) {
         // Expands forward to end of line, and then to next line if repeat is
         // >1. Does not handle backward motion!
         var cur = cm.getCursor();
         return { line: cur.line + motionArgs.repeat - 1, ch: Infinity };
       },
-      findNext: function(cm, motionArgs, vim) {
+      findNext(cm, motionArgs, vim) {
         return findNext(cm, false /** prev */, motionArgs.repeat);
       },
-      findPrev: function(cm, motionArgs, vim) {
+      findPrev(cm, motionArgs, vim) {
         return findNext(cm, true /** prev */, motionArgs.repeat);
       },
-      goToMark: function(cm, motionArgs, vim) {
+      goToMark(cm, motionArgs, vim) {
         var mark = vim.marks[motionArgs.selectedCharacter];
         if (mark) {
           return mark.find();
         }
         return null;
       },
-      moveByCharacters: function(cm, motionArgs) {
+      moveByCharacters(cm, motionArgs) {
         var cur = cm.getCursor();
         var repeat = motionArgs.repeat;
         var ch = motionArgs.forward ? cur.ch + repeat : cur.ch - repeat;
-        return { line: cur.line, ch: ch };
+        return { line: cur.line, ch };
       },
-      moveByLines: function(cm, motionArgs, vim) {
+      moveByLines(cm, motionArgs, vim) {
         var endCh = cm.getCursor().ch;
         // Depending what our last motion was, we may want to do different
         // things. If our last motion was moving vertically, we want to
@@ -924,9 +925,9 @@
         if (line < 0 || line > cm.lineCount() - 1) {
           return null;
         }
-        return { line: line, ch: endCh };
+        return { line, ch: endCh };
       },
-      moveByPage: function(cm, motionArgs) {
+      moveByPage(cm, motionArgs) {
         // CodeMirror only exposes functions that move the cursor page down, so
         // doing this bad hack to move the cursor and move it back. evalInput
         // will move the cursor to where it should be in the end.
@@ -937,7 +938,7 @@
         cm.setCursor(curStart);
         return curEnd;
       },
-      moveByParagraph: function(cm, motionArgs) {
+      moveByParagraph(cm, motionArgs) {
         var line = cm.getCursor().line;
         var repeat = motionArgs.repeat;
         var inc = motionArgs.forward ? 1 : -1;
@@ -951,13 +952,13 @@
             line += inc;
           }
         }
-        return { line: line, ch: 0 };
+        return { line, ch: 0 };
       },
-      moveByWords: function(cm, motionArgs) {
+      moveByWords(cm, motionArgs) {
         return moveToWord(cm, motionArgs.repeat, !!motionArgs.forward,
             !!motionArgs.wordEnd, !!motionArgs.bigWord);
       },
-      moveTillCharacter: function(cm, motionArgs) {
+      moveTillCharacter(cm, motionArgs) {
         var repeat = motionArgs.repeat;
         var curEnd = moveToCharacter(cm, repeat, motionArgs.forward,
             motionArgs.selectedCharacter);
@@ -965,23 +966,23 @@
         curEnd.ch += increment;
         return curEnd;
       },
-      moveToCharacter: function(cm, motionArgs) {
+      moveToCharacter(cm, motionArgs) {
         var repeat = motionArgs.repeat;
         return moveToCharacter(cm, repeat, motionArgs.forward,
             motionArgs.selectedCharacter);
       },
-      moveToColumn: function(cm, motionArgs, vim) {
+      moveToColumn(cm, motionArgs, vim) {
         var repeat = motionArgs.repeat;
         // repeat is equivalent to which column we want to move to!
         vim.lastHPos = repeat - 1;
         return moveToColumn(cm, repeat);
       },
-      moveToEol: function(cm, motionArgs, vim) {
+      moveToEol(cm, motionArgs, vim) {
         var cur = cm.getCursor();
         vim.lastHPos = Infinity;
         return { line: cur.line + motionArgs.repeat - 1, ch: Infinity };
       },
-      moveToFirstNonWhiteSpaceCharacter: function(cm) {
+      moveToFirstNonWhiteSpaceCharacter(cm) {
         // Go to the start of the line where the text begins, or the end for
         // whitespace-only lines
         var cursor = cm.getCursor();
@@ -989,7 +990,7 @@
         return { line: cursor.line,
             ch: findFirstNonWhiteSpaceCharacter(cm.getLine(cursor.line)) };
       },
-      moveToMatchedSymbol: function(cm, motionArgs) {
+      moveToMatchedSymbol(cm, motionArgs) {
         var cursor = cm.getCursor();
         var symbol = cm.getLine(cursor.line).charAt(cursor.ch);
         if (isMatchableSymbol(symbol)) {
@@ -998,11 +999,11 @@
           return cursor;
         }
       },
-      moveToStartOfLine: function(cm) {
+      moveToStartOfLine(cm) {
         var cursor = cm.getCursor();
         return { line: cursor.line, ch: 0 };
       },
-      moveToLineOrEdgeOfDocument: function(cm, motionArgs) {
+      moveToLineOrEdgeOfDocument(cm, motionArgs) {
         var lineNum = motionArgs.forward ? cm.lineCount() - 1 : 0;
         if (motionArgs.repeatIsExplicit) {
           lineNum = motionArgs.repeat - 1;
@@ -1010,7 +1011,7 @@
         return { line: lineNum,
             ch: findFirstNonWhiteSpaceCharacter(cm.getLine(lineNum)) };
       },
-      textObjectManipulation: function(cm, motionArgs) {
+      textObjectManipulation(cm, motionArgs) {
         var character = motionArgs.selectedCharacter;
         // Inclusive is the difference between a and i
         // TODO: Instead of using the additional text object map to perform text
@@ -1030,7 +1031,7 @@
     };
 
     var operators = {
-      change: function(cm, operatorArgs, vim, curStart, curEnd) {
+      change(cm, operatorArgs, vim, curStart, curEnd) {
         getVimGlobalState().registerController.pushText(
             operatorArgs.registerName, 'change', cm.getRange(curStart, curEnd),
             operatorArgs.linewise);
@@ -1064,7 +1065,7 @@
           cm.setCursor(curStart);
         }
       },
-      indent: function(cm, operatorArgs, vim, curStart, curEnd) {
+      indent(cm, operatorArgs, vim, curStart, curEnd) {
         var startLine = curStart.line;
         var endLine = curEnd.line;
         // In visual mode, n> shifts the selection right n times, instead of
@@ -1084,7 +1085,7 @@
         cm.setCursor(curStart);
         cm.setCursor(motions.moveToFirstNonWhiteSpaceCharacter(cm));
       },
-      swapcase: function(cm, operatorArgs, vim, curStart, curEnd, curOriginal) {
+      swapcase(cm, operatorArgs, vim, curStart, curEnd, curOriginal) {
         var toSwap = cm.getRange(curStart, curEnd);
         var swapped = '';
         for (var i = 0; i < toSwap.length; i++) {
@@ -1095,7 +1096,7 @@
         cm.replaceRange(swapped, curStart, curEnd);
         cm.setCursor(curOriginal);
       },
-      yank: function(cm, operatorArgs, vim, curStart, curEnd, curOriginal) {
+      yank(cm, operatorArgs, vim, curStart, curEnd, curOriginal) {
         getVimGlobalState().registerController.pushText(
             operatorArgs.registerName, 'yank',
             cm.getRange(curStart, curEnd), operatorArgs.linewise);
@@ -1104,8 +1105,8 @@
     };
 
     var actions = {
-      clearSearchHighlight: clearSearchHighlight,
-      enterInsertMode: function(cm, actionArgs) {
+      clearSearchHighlight,
+      enterInsertMode(cm, actionArgs) {
         var insertAt = (actionArgs) ? actionArgs.insertAt : null;
         if (insertAt == 'eol') {
           var cursor = cm.getCursor();
@@ -1116,7 +1117,7 @@
         }
         cm.setOption('keyMap', 'vim-insert');
       },
-      toggleVisualMode: function(cm, actionArgs, vim) {
+      toggleVisualMode(cm, actionArgs, vim) {
         var repeat = actionArgs.repeat;
         var curStart = cm.getCursor();
         var curEnd;
@@ -1173,8 +1174,9 @@
         updateMark(cm, vim, '>', cursorIsBefore(curStart, curEnd) ? curEnd
             : curStart);
       },
-      joinLines: function(cm, actionArgs, vim) {
-        var curStart, curEnd;
+      joinLines(cm, actionArgs, vim) {
+        var curStart;
+        var curEnd;
         if (vim.visualMode) {
           curStart = cm.getCursor('anchor');
           curEnd = cm.getCursor('head');
@@ -1187,7 +1189,7 @@
               ch: Infinity });
         }
         var finalCh = 0;
-        cm.operation(function() {
+        cm.operation(() => {
           for (var i = curStart.line; i < curEnd.line; i++) {
             finalCh = lineLength(cm, curStart.line);
             var tmp = { line: curStart.line + 1,
@@ -1200,7 +1202,7 @@
           cm.setCursor(curFinalPos);
         });
       },
-      newLineAndEnterInsertMode: function(cm, actionArgs) {
+      newLineAndEnterInsertMode(cm, actionArgs) {
         var insertAt = cm.getCursor();
         if (insertAt.line === 0 && !actionArgs.after) {
           // Special case for inserting newline before start of document.
@@ -1217,7 +1219,7 @@
         }
         this.enterInsertMode(cm);
       },
-      paste: function(cm, actionArgs, vim) {
+      paste(cm, actionArgs, vim) {
         var cur = cm.getCursor();
         var register = getVimGlobalState().registerController.getRegister(
             actionArgs.registerName);
@@ -1259,20 +1261,20 @@
         }
         cm.setCursor(curPosFinal);
       },
-      undo: function(cm, actionArgs) {
+      undo(cm, actionArgs) {
         repeatFn(cm, CodeMirror.commands.undo, actionArgs.repeat)();
       },
-      redo: function(cm, actionArgs) {
+      redo(cm, actionArgs) {
         repeatFn(cm, CodeMirror.commands.redo, actionArgs.repeat)();
       },
-      setRegister: function(cm, actionArgs, vim) {
+      setRegister(cm, actionArgs, vim) {
         vim.inputState.registerName = actionArgs.selectedCharacter;
       },
-      setMark: function(cm, actionArgs, vim) {
+      setMark(cm, actionArgs, vim) {
         var markName = actionArgs.selectedCharacter;
         updateMark(cm, vim, markName, cm.getCursor());
       },
-      replace: function(cm, actionArgs) {
+      replace(cm, actionArgs) {
         var replaceWith = actionArgs.selectedCharacter;
         var curStart = cm.getCursor();
         var line = cm.getLine(curStart.line);
@@ -1336,7 +1338,7 @@
       var maxCh = lineLength(cm, line) - 1;
       maxCh = (includeLineBreak) ? maxCh + 1 : maxCh;
       var ch = Math.min(Math.max(0, cur.ch), maxCh);
-      return { line: line, ch: ch };
+      return { line, ch };
     }
     // Merge arguments in place, for overriding arguments.
     function mergeArgs(to, from) {
@@ -1387,7 +1389,7 @@
       return true;
     }
     function repeatFn(cm, fn, repeat) {
-      return function() {
+      return () => {
         for (var i = 0; i < repeat; i++) {
           fn(cm);
         }
@@ -1540,7 +1542,8 @@
 
       while (true) {
         var stop = (dir > 0) ? line.length : -1;
-        var wordStart = stop, wordEnd = stop;
+        var wordStart = stop;
+        var wordEnd = stop;
         // Find bounds of next word.
         while (pos != stop) {
           var foundWord = false;
@@ -1595,7 +1598,9 @@
     function moveToWord(cm, repeat, forward, wordEnd, bigWord) {
       var cur = cm.getCursor();
       for (var i = 0; i < repeat; i++) {
-        var startCh = cur.ch, startLine = cur.line, word;
+        var startCh = cur.ch;
+        var startLine = cur.line;
+        var word;
         var movedToNextWord = false;
         while (!movedToNextWord) {
           // Search and advance.
@@ -1665,7 +1670,7 @@
       // repeat is always >= 1, so repeat - 1 always corresponds
       // to the column we want to go to.
       var line = cm.getCursor().line;
-      return clipCursorToContent(cm, { line: line, ch: repeat - 1 });
+      return clipCursorToContent(cm, { line, ch: repeat - 1 });
     }
 
     function updateMark(cm, vim, markName, pos) {
@@ -1719,7 +1724,10 @@
       // set our increment to move forward (+1) or backwards (-1)
       // depending on which bracket we're matching
       var increment = ({'(': 1, '{': 1, '[': 1})[symb] || -1;
-      var depth = 1, nextCh = symb, index = cur.ch, lineText = cm.getLine(line);
+      var depth = 1;
+      var nextCh = symb;
+      var index = cur.ch;
+      var lineText = cm.getLine(line);
       // Simple search for closing paren--just count openings and closings till
       // we find our match
       // TODO: use info from CodeMirror to ignore closing brackets in comments
@@ -1741,7 +1749,7 @@
       }
 
       if (nextCh) {
-        return { line: line, ch: index };
+        return { line, ch: index };
       }
       return cur;
     }
@@ -1754,7 +1762,7 @@
       start.ch += inclusive ? 1 : 0;
       end.ch += inclusive ? 0 : 1;
 
-      return { start: start, end: end };
+      return { start, end };
     }
 
     function regexLastIndexOf(string, pattern, startIndex) {
@@ -1774,7 +1782,10 @@
       var cur = cm.getCursor();
       var line = cm.getLine(cur.line);
       var chars = line.split('');
-      var start, end, i, len;
+      var start;
+      var end;
+      var i;
+      var len;
       var firstIndex = chars.indexOf(symb);
 
       // the decision tree is to always look backwards for the beginning first,
@@ -1834,22 +1845,22 @@
       this.marked = null;
     }
     SearchState.prototype = {
-      getQuery: function() {
+      getQuery() {
         return getVimGlobalState().query;
       },
-      setQuery: function(query) {
+      setQuery(query) {
         getVimGlobalState().query = query;
       },
-      getMarked: function() {
+      getMarked() {
         return this.marked;
       },
-      setMarked: function(marked) {
+      setMarked(marked) {
         this.marked = marked;
       },
-      isReversed: function() {
+      isReversed() {
         return getVimGlobalState().isReversed;
       },
-      setReversed: function(reversed) {
+      setReversed(reversed) {
         getVimGlobalState().isReversed = reversed;
       }
     };
@@ -1920,7 +1931,7 @@
     function showConfirm(cm, text) {
       if (cm.openConfirm) {
         cm.openConfirm('<span style="color: red">' + text +
-            '</span> <button type="button">OK</button>', function() {},
+            '</span> <button type="button">OK</button>', () => {},
             {bottom: true});
       } else {
         alert(text);
@@ -1960,7 +1971,7 @@
       return(false);
     }
     function updateSearchQuery(cm, rawQuery, ignoreCase, smartCase) {
-      cm.operation(function() {
+      cm.operation(() => {
         var state = getSearchState(cm);
         if (!rawQuery) {
           return;
@@ -1991,7 +2002,7 @@
       }
     }
     function findNext(cm, prev, repeat) {
-      return cm.operation(function() {
+      return cm.operation(() => {
         var state = getSearchState(cm);
         var query = state.getQuery();
         if (!query) {
@@ -2021,7 +2032,7 @@
         return cursor.from();
       });}
     function clearSearchHighlight(cm) {
-      cm.operation(function() {
+      cm.operation(() => {
         var state = getSearchState(cm);
         if (!state.getQuery()) {
           return;
@@ -2077,7 +2088,7 @@
       this.buildCommandMap_();
     };
     Vim.ExCommandDispatcher.prototype = {
-      processCommand: function(cm, input) {
+      processCommand(cm, input) {
         var inputStream = new CodeMirror.StringStream(input);
         var params = {};
         params.input = input;
@@ -2117,7 +2128,7 @@
         }
         exCommands[commandName](cm, params);
       },
-      parseInput_: function(cm, inputStream, result) {
+      parseInput_(cm, inputStream, result) {
         inputStream.eatWhile(':');
         // Parse range.
         if (inputStream.eat('%')) {
@@ -2140,7 +2151,7 @@
 
         return result;
       },
-      parseLineSpec_: function(cm, inputStream) {
+      parseLineSpec_(cm, inputStream) {
         var numberMatch = inputStream.match(/^(\d+)/);
         if (numberMatch) {
           return parseInt(numberMatch[1], 10) - 1;
@@ -2163,7 +2174,7 @@
             return cm.getCursor().line;
         }
       },
-      parseCommandArgs_: function(inputStream, params, command) {
+      parseCommandArgs_(inputStream, params, command) {
         if (inputStream.eol()) {
           return;
         }
@@ -2175,7 +2186,7 @@
           params.args = args;
         }
       },
-      matchCommand_: function(commandName) {
+      matchCommand_(commandName) {
         // Return the command in the command map that matches the shortest
         // prefix of the passed in command name. The match is guaranteed to be
         // unambiguous if the defaultExCommandMap's shortNames are set up
@@ -2191,7 +2202,7 @@
         }
         return null;
       },
-      buildCommandMap_: function() {
+      buildCommandMap_() {
         this.commandMap_ = {};
         for (var i = 0; i < defaultExCommandMap.length; i++) {
           var command = defaultExCommandMap[i];
@@ -2199,7 +2210,7 @@
           this.commandMap_[key] = command;
         }
       },
-      map: function(lhs, rhs) {
+      map(lhs, rhs) {
         if (lhs != ':' && lhs.charAt(0) == ':') {
           var commandName = lhs.substring(1);
           if (rhs != ':' && rhs.charAt(0) == ':') {
@@ -2276,7 +2287,7 @@
     }
 
     var exCommands = {
-      map: function(cm, params) {
+      map(cm, params) {
         var mapArgs = params.args;
         if (!mapArgs || mapArgs.length < 2) {
           if (cm) {
@@ -2286,13 +2297,13 @@
         }
         exCommandDispatcher.map(mapArgs[0], mapArgs[1], cm);
       },
-      move: function(cm, params) {
+      move(cm, params) {
         commandDispatcher.processMotion(cm, getVimState(cm), {
             motion: 'moveToLineOrEdgeOfDocument',
             motionArgs: { forward: false, explicitRepeat: true,
               linewise: true, repeat: params.line }});
       },
-      substitute: function(cm, params) {
+      substitute(cm, params) {
         var argString = params.argString;
         var slashes = findUnescapedSlashes(argString);
         if (slashes[0] !== 0) {
@@ -2354,7 +2365,7 @@
       },
       redo: CodeMirror.commands.redo,
       undo: CodeMirror.commands.undo,
-      write: function(cm) {
+      write(cm) {
         if (CodeMirror.commands.save) {
           // If a save command is defined, call it.
           CodeMirror.commands.save(cm);
@@ -2395,7 +2406,7 @@
 
       // Closure to bind CodeMirror, key, modifier.
       function keyMapper(key, modifier) {
-        return function(cm) {
+        return cm => {
           handleKeyEvent_(cm, key, modifier);
         };
       }
@@ -2459,5 +2470,5 @@
   // Initialize Vim and make it available as an API.
   var vim = Vim();
   CodeMirror.Vim = vim;
-}
+})
 )();

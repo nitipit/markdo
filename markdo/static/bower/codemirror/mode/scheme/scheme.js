@@ -1,13 +1,20 @@
 /**
  * Author: Koh Zi Han, based on implementation by Koh Zi Chun
  */
-CodeMirror.defineMode("scheme", function (config, mode) {
-    var BUILTIN = "builtin", COMMENT = "comment", STRING = "string",
-        ATOM = "atom", NUMBER = "number", BRACKET = "bracket", KEYWORD="keyword";
-    var INDENT_WORD_SKIP = 2, KEYWORDS_SKIP = 1;
+CodeMirror.defineMode("scheme", (config, mode) => {
+    var BUILTIN = "builtin";
+    var COMMENT = "comment";
+    var STRING = "string";
+    var ATOM = "atom";
+    var NUMBER = "number";
+    var BRACKET = "bracket";
+    var KEYWORD="keyword";
+    var INDENT_WORD_SKIP = 2;
+    var KEYWORDS_SKIP = 1;
 
     function makeKeywords(str) {
-        var obj = {}, words = str.split(" ");
+        var obj = {};
+        var words = str.split(" ");
         for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
         return obj;
     }
@@ -54,7 +61,7 @@ CodeMirror.defineMode("scheme", function (config, mode) {
     }
 
     return {
-        startState: function () {
+        startState() {
             return {
                 indentStack: null,
                 indentation: 0,
@@ -63,7 +70,7 @@ CodeMirror.defineMode("scheme", function (config, mode) {
             };
         },
 
-        token: function (stream, state) {
+        token(stream, state) {
             if (state.indentStack == null && stream.sol()) {
                 // update indentation, but only if indentStack is empty
                 state.indentation = stream.indentation();
@@ -76,8 +83,10 @@ CodeMirror.defineMode("scheme", function (config, mode) {
             var returnType = null;
 
             switch(state.mode){
-                case "string": // multi-line string parsing mode
-                    var next, escaped = false;
+                case // multi-line string parsing mode
+                "string":
+                    var next;
+                    var escaped = false;
                     while ((next = stream.next()) != null) {
                         if (next == "\"" && !escaped) {
 
@@ -88,8 +97,10 @@ CodeMirror.defineMode("scheme", function (config, mode) {
                     }
                     returnType = STRING; // continue on in scheme-string mode
                     break;
-                case "comment": // comment parsing mode
-                    var next, maybeEnd = false;
+                case // comment parsing mode
+                "comment":
+                    var next;
+                    var maybeEnd = false;
                     while ((next = stream.next()) != null) {
                         if (next == "#" && maybeEnd) {
 
@@ -130,7 +141,9 @@ CodeMirror.defineMode("scheme", function (config, mode) {
                             state.mode = "s-expr-comment";
                             returnType = COMMENT;
                         } else {
-                            var numTest = null, hasExactness = false, hasRadix = true;
+                            var numTest = null;
+                            var hasExactness = false;
+                            var hasRadix = true;
                             if (stream.eat(/[ei]/i)) {
                                 hasExactness = true;
                             } else {
@@ -166,7 +179,9 @@ CodeMirror.defineMode("scheme", function (config, mode) {
                         stream.skipToEnd(); // rest of the line is a comment
                         returnType = COMMENT;
                     } else if (ch == "(" || ch == "[") {
-                      var keyWord = ''; var indentTemp = stream.column(), letter;
+                        var keyWord = '';
+                        var indentTemp = stream.column();
+                        var letter;
                         /**
                         Either
                         (indent-word ..
@@ -220,7 +235,7 @@ CodeMirror.defineMode("scheme", function (config, mode) {
             return (typeof state.sExprComment == "number") ? COMMENT : returnType;
         },
 
-        indent: function (state, textAfter) {
+        indent(state, textAfter) {
             if (state.indentStack == null) return state.indentation;
             return state.indentStack.indent;
         }

@@ -10,7 +10,7 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
   }
 
   return {
-    startState: function() {
+    startState() {
       return {
         outer: CodeMirror.startState(outer),
         innerActive: null,
@@ -18,7 +18,7 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
       };
     },
 
-    copyState: function(state) {
+    copyState(state) {
       return {
         outer: CodeMirror.copyState(outer, state.outer),
         innerActive: state.innerActive,
@@ -26,9 +26,10 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
       };
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       if (!state.innerActive) {
-        var cutOff = Infinity, oldContent = stream.string;
+        var cutOff = Infinity;
+        var oldContent = stream.string;
         for (var i = 0; i < n_others; ++i) {
           var other = others[i];
           var found = indexOf(oldContent, other.open, stream.pos);
@@ -46,7 +47,8 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
         if (cutOff != Infinity) stream.string = oldContent;
         return outerToken;
       } else {
-        var curInner = state.innerActive, oldContent = stream.string;
+        var curInner = state.innerActive;
+        var oldContent = stream.string;
         var found = indexOf(oldContent, curInner.close, stream.pos);
         if (found == stream.pos) {
           stream.match(curInner.close);
@@ -56,19 +58,20 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
         if (found > -1) stream.string = oldContent.slice(0, found);
         var innerToken = curInner.mode.token(stream, state.inner);
         if (found > -1) stream.string = oldContent;
-        var cur = stream.current(), found = cur.indexOf(curInner.close);
+        var cur = stream.current();
+        var found = cur.indexOf(curInner.close);
         if (found > -1) stream.backUp(cur.length - found);
         return innerToken;
       }
     },
     
-    indent: function(state, textAfter) {
+    indent(state, textAfter) {
       var mode = state.innerActive ? state.innerActive.mode : outer;
       if (!mode.indent) return CodeMirror.Pass;
       return mode.indent(state.innerActive ? state.inner : state.outer, textAfter);
     },
 
-    blankLine: function(state) {
+    blankLine(state) {
       var mode = state.innerActive ? state.innerActive.mode : outer;
       if (mode.blankLine) {
         mode.blankLine(state.innerActive ? state.inner : state.outer);
@@ -88,7 +91,7 @@ CodeMirror.multiplexingMode = function(outer /*, others */) {
 
     electricChars: outer.electricChars,
 
-    innerMode: function(state) {
+    innerMode(state) {
       return state.inner ? {state: state.inner, mode: state.innerActive.mode} : {state: state.outer, mode: outer};
     }
   };

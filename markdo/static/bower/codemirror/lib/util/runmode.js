@@ -1,14 +1,16 @@
-CodeMirror.runMode = function(string, modespec, callback, options) {
+CodeMirror.runMode = (string, modespec, callback, options) => {
   function esc(str) {
-    return str.replace(/[<&]/g, function(ch) { return ch == "<" ? "&lt;" : "&amp;"; });
+    return str.replace(/[<&]/g, ch => ch == "<" ? "&lt;" : "&amp;");
   }
 
   var mode = CodeMirror.getMode(CodeMirror.defaults, modespec);
   var isNode = callback.nodeType == 1;
   var tabSize = (options && options.tabSize) || CodeMirror.defaults.tabSize;
   if (isNode) {
-    var node = callback, accum = [], col = 0;
-    callback = function(text, style) {
+    var node = callback;
+    var accum = [];
+    var col = 0;
+    callback = (text, style) => {
       if (text == "\n") {
         accum.push("<br>");
         col = 0;
@@ -38,7 +40,8 @@ CodeMirror.runMode = function(string, modespec, callback, options) {
         accum.push(escaped);
     };
   }
-  var lines = CodeMirror.splitLines(string), state = CodeMirror.startState(mode);
+  var lines = CodeMirror.splitLines(string);
+  var state = CodeMirror.startState(mode);
   for (var i = 0, e = lines.length; i < e; ++i) {
     if (i) callback("\n");
     var stream = new CodeMirror.StringStream(lines[i]);

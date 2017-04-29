@@ -1,6 +1,6 @@
-  $(document).ready(function(){
+  $(document).ready(() => {
     module("testMultiAttr");
-    test("test1", function() {
+    test("test1", () => {
       expect(1);
 
       var expected = '<span class="cm-tag">&lt;p </span><span class="cm-attribute">a1</span>=<span class="cm-string">"foo"</span> <span class="cm-attribute">a2</span>=<span class="cm-string">"bar"</span><span class="cm-tag">&gt;</span><span class="cm-word">hello</span> <span class="cm-word">world</span><span class="cm-tag">&lt;/p&gt;</span>';

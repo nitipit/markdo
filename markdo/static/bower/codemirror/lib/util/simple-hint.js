@@ -1,11 +1,13 @@
-(function() {
-  CodeMirror.simpleHint = function(editor, getHints, givenOptions) {
+((() => {
+  CodeMirror.simpleHint = (editor, getHints, givenOptions) => {
     // Determine effective options based on given values and defaults.
-    var options = {}, defaults = CodeMirror.simpleHint.defaults;
+    var options = {};
+
+    var defaults = CodeMirror.simpleHint.defaults;
     for (var opt in defaults)
       if (defaults.hasOwnProperty(opt))
         options[opt] = (givenOptions && givenOptions.hasOwnProperty(opt) ? givenOptions : defaults)[opt];
-    
+
     function collectHints(previousToken) {
       // We want a single cursor position.
       if (editor.somethingSelected()) return;
@@ -65,10 +67,10 @@
       function pick() {
         insert(completions[sel.selectedIndex]);
         close();
-        setTimeout(function(){editor.focus();}, 50);
+        setTimeout(() => {editor.focus();}, 50);
       }
       CodeMirror.connect(sel, "blur", close);
-      CodeMirror.connect(sel, "keydown", function(event) {
+      CodeMirror.connect(sel, "keydown", event => {
         var code = event.keyCode;
         // Enter
         if (code == 13) {CodeMirror.e_stop(event); pick();}
@@ -80,7 +82,7 @@
           editor.triggerOnKeyDown(event);
           // Don't show completions if the code is backspace and the option is set.
           if (!options.closeOnBackspace || code != 8) {
-            setTimeout(function(){collectHints(tempToken);}, 50);
+            setTimeout(() => {collectHints(tempToken);}, 50);
           }
         }
       });
@@ -88,7 +90,7 @@
 
       sel.focus();
       // Opera sometimes ignores focusing a freshly created node
-      if (window.opera) setTimeout(function(){if (!done) sel.focus();}, 100);
+      if (window.opera) setTimeout(() => {if (!done) sel.focus();}, 100);
       return true;
     }
     return collectHints();
@@ -99,4 +101,4 @@
     completeSingle: true,
     alignWithWord: true
   };
-})();
+}))();

@@ -1,5 +1,4 @@
-CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
-
+CodeMirror.defineMode("markdown", (cmCfg, modeCfg) => {
   var htmlFound = CodeMirror.mimeModes.hasOwnProperty("text/html");
   var htmlMode = CodeMirror.getMode(cmCfg, htmlFound ? "text/html" : "text/plain");
   var aliases = {
@@ -13,8 +12,11 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
     "c#": "text/x-csharp"
   };
 
-  var getMode = (function () {
-    var i, modes = {}, mimes = {}, mime;
+  var getMode = ((() => {
+    var i;
+    var modes = {};
+    var mimes = {};
+    var mime;
 
     var list = CodeMirror.listModes();
     for (i = 0; i < list.length; i++) {
@@ -30,42 +32,38 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       if (aliases[a] in modes || aliases[a] in mimes)
         modes[a] = aliases[a];
     }
-    
-    return function (lang) {
-      return modes[lang] ? CodeMirror.getMode(cmCfg, modes[lang]) : null;
-    };
-  }());
-  
+
+    return lang => modes[lang] ? CodeMirror.getMode(cmCfg, modes[lang]) : null;
+  })());
+
   // Should underscores in words open/close em/strong?
   if (modeCfg.underscoresBreakWords === undefined)
     modeCfg.underscoresBreakWords = true;
-  
+
   // Turn on fenced code blocks? ("```" to start/end)
   if (modeCfg.fencedCodeBlocks === undefined) modeCfg.fencedCodeBlocks = false;
-  
+
   var codeDepth = 0;
-  var prevLineHasContent = false
-  ,   thisLineHasContent = false;
-
-  var header   = 'header'
-  ,   code     = 'comment'
-  ,   quote    = 'quote'
-  ,   list     = 'string'
-  ,   hr       = 'hr'
-  ,   image    = 'tag'
-  ,   linkinline = 'link'
-  ,   linkemail = 'link'
-  ,   linktext = 'link'
-  ,   linkhref = 'string'
-  ,   em       = 'em'
-  ,   strong   = 'strong'
-  ,   emstrong = 'emstrong';
-
-  var hrRE = /^([*\-=_])(?:\s*\1){2,}\s*$/
-  ,   ulRE = /^[*\-+]\s+/
-  ,   olRE = /^[0-9]+\.\s+/
-  ,   headerRE = /^(?:\={1,}|-{1,})$/
-  ,   textRE = /^[^!\[\]*_\\<>` "'(]+/;
+  var prevLineHasContent = false;
+  var thisLineHasContent = false;
+  var header   = 'header';
+  var code     = 'comment';
+  var quote    = 'quote';
+  var list     = 'string';
+  var hr       = 'hr';
+  var image    = 'tag';
+  var linkinline = 'link';
+  var linkemail = 'link';
+  var linktext = 'link';
+  var linkhref = 'string';
+  var em       = 'em';
+  var strong   = 'strong';
+  var emstrong = 'emstrong';
+  var hrRE = /^([*\-=_])(?:\s*\1){2,}\s*$/;
+  var ulRE = /^[*\-+]\s+/;
+  var olRE = /^[0-9]+\.\s+/;
+  var headerRE = /^(?:\={1,}|-{1,})$/;
+  var textRE = /^[^!\[\]*_\\<>` "'(]+/;
 
   function switchInline(stream, state, f) {
     state.f = state.inline = f;
@@ -386,7 +384,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
 
   function inlineElement(type, endChar, next) {
     next = next || inlineNormal;
-    return function(stream, state) {
+    return (stream, state) => {
       stream.match(inlineRE(endChar));
       state.inline = state.f = next;
       return type;
@@ -394,7 +392,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
   }
 
   return {
-    startState: function() {
+    startState() {
       prevLineHasContent = false;
       thisLineHasContent = false;
       return {
@@ -417,7 +415,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       };
     },
 
-    copyState: function(s) {
+    copyState(s) {
       return {
         f: s.f,
         
@@ -440,7 +438,7 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       };
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       if (stream.sol()) {
         if (stream.match(/^\s*$/, true)) {
           prevLineHasContent = false;
@@ -471,11 +469,10 @@ CodeMirror.defineMode("markdown", function(cmCfg, modeCfg) {
       return state.f(stream, state);
     },
 
-    blankLine: blankLine,
+    blankLine,
 
-    getType: getType
+    getType
   };
-
 }, "xml");
 
 CodeMirror.defineMIME("text/x-markdown", "markdown");

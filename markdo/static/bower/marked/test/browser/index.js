@@ -1,13 +1,12 @@
 var fs = require('fs');
 
-var test = require('../')
-  , runTests = test.runTests
-  , load = test.load;
+var test = require('../');
+var runTests = test.runTests;
+var load = test.load;
+var express = require('express');
+var app = express();
 
-var express = require('express')
-  , app = express();
-
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   var setHeader = res.setHeader;
   res.setHeader = function(name) {
     switch (name) {
@@ -21,12 +20,12 @@ app.use(function(req, res, next) {
   next();
 });
 
-var dir = __dirname + '/../tests'
-  , files = {};
+var dir = __dirname + '/../tests';
+var files = {};
 
-app.get('/test.js', function(req, res, next) {
-  var test = fs.readFileSync(__dirname + '/test.js', 'utf8')
-    , files = load();
+app.get('/test.js', (req, res, next) => {
+  var test = fs.readFileSync(__dirname + '/test.js', 'utf8');
+  var files = load();
 
   test = test.replace('__TESTS__', JSON.stringify(files));
   test = test.replace('__MAIN__', runTests + '');

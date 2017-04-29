@@ -1,12 +1,14 @@
-CodeMirror.defineMode("htmlembedded", function(config, parserConfig) {
-  
+CodeMirror.defineMode("htmlembedded", (config, parserConfig) => {
   //config settings
-  var scriptStartRegex = parserConfig.scriptStartRegex || /^<%/i,
-      scriptEndRegex = parserConfig.scriptEndRegex || /^%>/i;
-  
+  var scriptStartRegex = parserConfig.scriptStartRegex || /^<%/i;
+
+  var scriptEndRegex = parserConfig.scriptEndRegex || /^%>/i;
+
   //inner modes
-  var scriptingMode, htmlMixedMode;
-  
+  var scriptingMode;
+
+  var htmlMixedMode;
+
   //tokenizer when in html mode
   function htmlDispatch(stream, state) {
       if (stream.match(scriptStartRegex, false)) {
@@ -29,7 +31,7 @@ CodeMirror.defineMode("htmlembedded", function(config, parserConfig) {
 
 
   return {
-    startState: function() {
+    startState() {
       scriptingMode = scriptingMode || CodeMirror.getMode(config, parserConfig.scriptingModeSpec);
       htmlMixedMode = htmlMixedMode || CodeMirror.getMode(config, "htmlmixed");
       return { 
@@ -39,18 +41,18 @@ CodeMirror.defineMode("htmlembedded", function(config, parserConfig) {
       };
     },
 
-    token: function(stream, state) {
+    token(stream, state) {
       return state.token(stream, state);
     },
 
-    indent: function(state, textAfter) {
+    indent(state, textAfter) {
       if (state.token == htmlDispatch)
         return htmlMixedMode.indent(state.htmlState, textAfter);
       else if (scriptingMode.indent)
         return scriptingMode.indent(state.scriptState, textAfter);
     },
     
-    copyState: function(state) {
+    copyState(state) {
       return {
        token : state.token,
        htmlState : CodeMirror.copyState(htmlMixedMode, state.htmlState),
@@ -60,7 +62,7 @@ CodeMirror.defineMode("htmlembedded", function(config, parserConfig) {
     
     electricChars: "/{}:",
 
-    innerMode: function(state) {
+    innerMode(state) {
       if (state.token == scriptingDispatch) return {state: state.scriptState, mode: scriptingMode};
       else return {state: state.htmlState, mode: htmlMixedMode};
     }

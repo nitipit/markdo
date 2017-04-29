@@ -1,6 +1,7 @@
-CodeMirror.defineMode("velocity", function(config) {
+CodeMirror.defineMode("velocity", config => {
     function parseWords(str) {
-        var obj = {}, words = str.split(" ");
+        var obj = {};
+        var words = str.split(" ");
         for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
         return obj;
     }
@@ -85,8 +86,10 @@ CodeMirror.defineMode("velocity", function(config) {
     }
 
     function tokenString(quote) {
-        return function(stream, state) {
-            var escaped = false, next, end = false;
+        return (stream, state) => {
+            var escaped = false;
+            var next;
+            var end = false;
             while ((next = stream.next()) != null) {
                 if (next == quote && !escaped) {
                     end = true;
@@ -100,7 +103,8 @@ CodeMirror.defineMode("velocity", function(config) {
     }
 
     function tokenComment(stream, state) {
-        var maybeEnd = false, ch;
+        var maybeEnd = false;
+        var ch;
         while (ch = stream.next()) {
             if (ch == "#" && maybeEnd) {
                 state.tokenize = tokenBase;
@@ -112,7 +116,8 @@ CodeMirror.defineMode("velocity", function(config) {
     }
 
     function tokenUnparsed(stream, state) {
-        var maybeEnd = 0, ch;
+        var maybeEnd = 0;
+        var ch;
         while (ch = stream.next()) {
             if (ch == "#" && maybeEnd == 2) {
                 state.tokenize = tokenBase;
@@ -128,7 +133,7 @@ CodeMirror.defineMode("velocity", function(config) {
     // Interface
 
     return {
-        startState: function(basecolumn) {
+        startState(basecolumn) {
             return {
                 tokenize: tokenBase,
                 beforeParams: false,
@@ -136,7 +141,7 @@ CodeMirror.defineMode("velocity", function(config) {
             };
         },
 
-        token: function(stream, state) {
+        token(stream, state) {
             if (stream.eatSpace()) return null;
             return state.tokenize(stream, state);
         }

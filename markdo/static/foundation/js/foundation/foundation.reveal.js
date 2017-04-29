@@ -1,4 +1,4 @@
-;(function ($, window, document, undefined) {
+;((($, window, document, undefined) => {
   'use strict';
 
   Foundation.libs.reveal = {
@@ -15,10 +15,10 @@
       close_on_esc: true,
       dismiss_modal_class: 'close-reveal-modal',
       bg_class: 'reveal-modal-bg',
-      open: function(){},
-      opened: function(){},
-      close: function(){},
-      closed: function(){},
+      open() {},
+      opened() {},
+      close() {},
+      closed() {},
       bg : $('.reveal-modal-bg'),
       css : {
         open : {
@@ -34,13 +34,13 @@
       }
     },
 
-    init : function (scope, method, options) {
+    init(scope, method, options) {
       Foundation.inherit(this, 'delay');
       $.extend(true, this.settings, method, options);
       this.bindings(method, options);
     },
 
-    events : function (scope) {
+    events(scope) {
       var self = this;
 
       $('[data-reveal-id]', this.scope)
@@ -49,8 +49,8 @@
           e.preventDefault();
 
           if (!self.locked) {
-            var element = $(this),
-                ajax = element.data('reveal-ajax');
+            var element = $(this);
+            var ajax = element.data('reveal-ajax');
 
             self.locked = true;
 
@@ -59,7 +59,7 @@
             } else {
               var url = ajax === true ? element.attr('href') : ajax;
 
-              self.open.call(self, element, {url: url});
+              self.open.call(self, element, {url});
             }
           }
         });
@@ -73,8 +73,8 @@
           e.preventDefault();
 
           if (!self.locked) {
-            var settings = $('[data-reveal].open').data('reveal-init'),
-                bg_clicked = $(e.target)[0] === $('.' + settings.bg_class)[0];
+            var settings = $('[data-reveal].open').data('reveal-init');
+            var bg_clicked = $(e.target)[0] === $('.' + settings.bg_class)[0];
 
             if (bg_clicked && !settings.close_on_background_click) {
               return;
@@ -109,13 +109,13 @@
     },
 
     // PATCH #3: turning on key up capture only when a reveal window is open
-    key_up_on : function (scope) {
+    key_up_on(scope) {
       var self = this;
 
       // PATCH #1: fixing multiple keyup event trigger from single key press
-      $('body').off('keyup.fndtn.reveal').on('keyup.fndtn.reveal', function ( event ) {
-        var open_modal = $('[data-reveal].open'),
-            settings = open_modal.data('reveal-init');
+      $('body').off('keyup.fndtn.reveal').on('keyup.fndtn.reveal', event => {
+        var open_modal = $('[data-reveal].open');
+        var settings = open_modal.data('reveal-init');
         // PATCH #2: making sure that the close event can be called only while unlocked,
         //           so that multiple keyup.fndtn.reveal events don't prevent clean closing of the reveal window.
         if ( settings && event.which === 27  && settings.close_on_esc && !self.locked) { // 27 is the keycode for the Escape key
@@ -127,12 +127,12 @@
     },
 
     // PATCH #3: turning on key up capture only when a reveal window is open
-    key_up_off : function (scope) {
+    key_up_off(scope) {
       $('body').off('keyup.fndtn.reveal');
       return true;
     },
 
-    open : function (target, ajax_settings) {
+    open(target, ajax_settings) {
       var self = this;
       if (target) {
         if (typeof target.selector !== 'undefined') {
@@ -180,7 +180,7 @@
           var old_success = typeof ajax_settings.success !== 'undefined' ? ajax_settings.success : null;
 
           $.extend(ajax_settings, {
-            success: function (data, textStatus, jqXHR) {
+            success(data, textStatus, jqXHR) {
               if ( $.isFunction(old_success) ) {
                 old_success(data, textStatus, jqXHR);
               }
@@ -201,10 +201,10 @@
       }
     },
 
-    close : function (modal) {
-      var modal = modal && modal.length ? modal : $(this.scope),
-          open_modals = $('[data-reveal].open'),
-          settings = modal.data('reveal-init');
+    close(modal) {
+      var modal = modal && modal.length ? modal : $(this.scope);
+      var open_modals = $('[data-reveal].open');
+      var settings = modal.data('reveal-init');
 
       if (open_modals.length > 0) {
         this.locked = true;
@@ -215,7 +215,7 @@
       }
     },
 
-    close_targets : function () {
+    close_targets() {
       var base = '.' + this.settings.dismiss_modal_class;
 
       if (this.settings.close_on_background_click) {
@@ -225,7 +225,7 @@
       return base;
     },
 
-    toggle_bg : function (modal) {
+    toggle_bg(modal) {
       var settings = modal.data('reveal-init');
 
       if ($('.' + this.settings.bg_class).length === 0) {
@@ -240,14 +240,14 @@
       }
     },
 
-    show : function (el, css) {
+    show(el, css) {
       // is modal
       if (css) {
         var settings = el.data('reveal-init');
         if (el.parent('body').length === 0) {
-          var placeholder = el.wrap('<div style="display: none;" />').parent(),
-              rootElement = this.settings.rootElement || 'body';;
-          el.on('closed.fndtn.reveal.wrapped', function() {
+          var placeholder = el.wrap('<div style="display: none;" />').parent();
+          var rootElement = this.settings.rootElement || 'body';
+          el.on('closed.fndtn.reveal.wrapped', () => {
             el.detach().appendTo(placeholder);
             el.unwrap().unbind('closed.fndtn.reveal.wrapped');
           });
@@ -262,29 +262,25 @@
             opacity: 1
           };
 
-          return this.delay(function () {
-            return el
-              .css(css)
-              .animate(end_css, settings.animation_speed, 'linear', function () {
-                this.locked = false;
-                el.trigger('opened');
-              }.bind(this))
-              .addClass('open');
-          }.bind(this), settings.animation_speed / 2);
+          return this.delay(() => el
+            .css(css)
+            .animate(end_css, settings.animation_speed, 'linear', () => {
+              this.locked = false;
+              el.trigger('opened');
+            })
+            .addClass('open'), settings.animation_speed / 2);
         }
 
         if (/fade/i.test(settings.animation)) {
           var end_css = {opacity: 1};
 
-          return this.delay(function () {
-            return el
-              .css(css)
-              .animate(end_css, settings.animation_speed, 'linear', function () {
-                this.locked = false;
-                el.trigger('opened');
-              }.bind(this))
-              .addClass('open');
-          }.bind(this), settings.animation_speed / 2);
+          return this.delay(() => el
+            .css(css)
+            .animate(end_css, settings.animation_speed, 'linear', () => {
+              this.locked = false;
+              el.trigger('opened');
+            })
+            .addClass('open'), settings.animation_speed / 2);
         }
 
         return el.css(css).show().css({opacity: 1}).addClass('open').trigger('opened');
@@ -300,7 +296,7 @@
       return el.show();
     },
 
-    hide : function (el, css) {
+    hide(el, css) {
       // is modal
       if (css) {
         var settings = el.data('reveal-init');
@@ -310,27 +306,23 @@
             opacity: 0
           };
 
-          return this.delay(function () {
-            return el
-              .animate(end_css, settings.animation_speed, 'linear', function () {
-                this.locked = false;
-                el.css(css).trigger('closed');
-              }.bind(this))
-              .removeClass('open');
-          }.bind(this), settings.animation_speed / 2);
+          return this.delay(() => el
+            .animate(end_css, settings.animation_speed, 'linear', () => {
+              this.locked = false;
+              el.css(css).trigger('closed');
+            })
+            .removeClass('open'), settings.animation_speed / 2);
         }
 
         if (/fade/i.test(settings.animation)) {
           var end_css = {opacity: 0};
 
-          return this.delay(function () {
-            return el
-              .animate(end_css, settings.animation_speed, 'linear', function () {
-                this.locked = false;
-                el.css(css).trigger('closed');
-              }.bind(this))
-              .removeClass('open');
-          }.bind(this), settings.animation_speed / 2);
+          return this.delay(() => el
+            .animate(end_css, settings.animation_speed, 'linear', () => {
+              this.locked = false;
+              el.css(css).trigger('closed');
+            })
+            .removeClass('open'), settings.animation_speed / 2);
         }
 
         return el.hide().css(css).removeClass('open').trigger('closed');
@@ -346,9 +338,9 @@
       return el.hide();
     },
 
-    close_video : function (e) {
-      var video = $(this).find('.flex-video'),
-          iframe = video.find('iframe');
+    close_video(e) {
+      var video = $(this).find('.flex-video');
+      var iframe = video.find('iframe');
 
       if (iframe.length > 0) {
         iframe.attr('data-src', iframe[0].src);
@@ -357,9 +349,9 @@
       }
     },
 
-    open_video : function (e) {
-      var video = $(this).find('.flex-video'),
-          iframe = video.find('iframe');
+    open_video(e) {
+      var video = $(this).find('.flex-video');
+      var iframe = video.find('iframe');
 
       if (iframe.length > 0) {
         var data_src = iframe.attr('data-src');
@@ -374,7 +366,7 @@
       }
     },
 
-    cache_offset : function (modal) {
+    cache_offset(modal) {
       var offset = modal.show().height() + parseInt(modal.css('top'), 10);
 
       modal.hide();
@@ -382,10 +374,10 @@
       return offset;
     },
 
-    off : function () {
+    off() {
       $(this.scope).off('.fndtn.reveal');
     },
 
-    reflow : function () {}
+    reflow() {}
   };
-}(jQuery, this, this.document));
+})(jQuery, this, this.document));

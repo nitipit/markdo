@@ -1,4 +1,4 @@
-(function () {
+((() => {
   function forEach(arr, f) {
     for (var i = 0, e = arr.length; i < e; ++i) f(arr[i]);
   }
@@ -18,18 +18,21 @@
 
   function scriptHint(editor, keywords, getToken) {
     // Find the token at the cursor
-    var cur = editor.getCursor(), token = getToken(editor, cur), tprop = token;
+    var cur = editor.getCursor();
+
+    var token = getToken(editor, cur);
+    var tprop = token;
     // If it's not a 'word-style' token, ignore the token.
 
     if (!/^[\w$_]*$/.test(token.string)) {
         token = tprop = {start: cur.ch, end: cur.ch, string: "", state: token.state,
                          className: token.string == ":" ? "pig-type" : null};
     }
-      
+
     if (!context) var context = [];
     context.push(tprop);
-    
-    var completionList = getCompletions(token, context); 
+
+    var completionList = getCompletions(token, context);
     completionList = completionList.sort();
     //prevent autocomplete for last word, instead show dropdown with one word
     if(completionList.length == 1) {
@@ -41,14 +44,10 @@
               to: {line: cur.line, ch: token.end}};
   }
   
-  CodeMirror.pigHint = function(editor) {
-    return scriptHint(editor, pigKeywordsU, function (e, cur) {return e.getTokenAt(cur);});
-  };
+  CodeMirror.pigHint = editor => scriptHint(editor, pigKeywordsU, (e, cur) => e.getTokenAt(cur));
  
  function toTitleCase(str) {
-    return str.replace(/(?:^|\s)\w/g, function(match) {
-        return match.toUpperCase();
-    });
+    return str.replace(/(?:^|\s)\w/g, match => match.toUpperCase());
  }
   
   var pigKeywords = "VOID IMPORT RETURNS DEFINE LOAD FILTER FOREACH ORDER CUBE DISTINCT COGROUP "
@@ -84,11 +83,12 @@
   + "StringMin StringSize TextLoader TupleSize Utf8StorageConverter").split(" ").join("() ").split(" ");
                     
   function getCompletions(token, context) {
-    var found = [], start = token.string;
+    var found = [];
+    var start = token.string;
     function maybeAdd(str) {
       if (str.indexOf(start) == 0 && !arrayContains(found, str)) found.push(str);
     }
-    
+
     function gatherCompletions(obj) {
       if(obj == ":") {
         forEach(pigTypesL, maybeAdd);
@@ -107,17 +107,19 @@
     if (context) {
       // If this is a property, see if it belongs to some object we can
       // find in the current environment.
-      var obj = context.pop(), base;
+      var obj = context.pop();
+
+      var base;
 
       if (obj.className == "pig-word") 
           base = obj.string;
       else if(obj.className == "pig-type")
           base = ":" + obj.string;
-        
+
       while (base != null && context.length)
         base = base[context.pop().string];
       if (base != null) gatherCompletions(base);
     }
     return found;
   }
-})();
+}))();

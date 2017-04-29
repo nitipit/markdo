@@ -16,7 +16,7 @@
  * @author Nathan Williams <nathan@nlwillia.net>
  * Contributed under the same license terms as CodeMirror.
  */
-(function() {
+((() => {
 	/** Option that allows tag closing behavior to be toggled.  Default is true. */
 	CodeMirror.defaults['closeTagEnabled'] = true;
 	
@@ -40,7 +40,7 @@
 	 *   Pass false to disable indentation.  Pass an array to override the default list of tag names.
 	 * - vd: Optional.  An array of tag names that should not be closed.  Omit to use the default void (end tag forbidden) tag list defined in the 'closeTagVoid' option.  Ignored in xml mode.
 	 */
-	CodeMirror.defineExtension("closeTag", function(cm, ch, indent, vd) {
+	CodeMirror.defineExtension("closeTag", (cm, ch, indent, vd) => {
 		if (!cm.getOption('closeTagEnabled')) {
 			throw CodeMirror.Pass;
 		}
@@ -101,12 +101,13 @@
 			
 			} else if (ch == '/') {
 				if (tok.className == 'tag' && tok.string == '<') {
-					var ctx = state.context, tagName = ctx ? ctx.tagName : '';
-					if (tagName.length > 0) {
+                    var ctx = state.context;
+                    var tagName = ctx ? ctx.tagName : '';
+                    if (tagName.length > 0) {
 						completeEndTag(cm, pos, tagName);
 						return;
 					}
-				}
+                }
 			}
 		
 		}
@@ -162,4 +163,4 @@
 		cm.setCursor({line: pos.line, ch: pos.ch + tagName.length + 2 });
 	}
 	
-})();
+}))();

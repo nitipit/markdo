@@ -1,7 +1,5 @@
-CodeMirror.defineMode("sass", function(config) {
-  var tokenRegexp = function(words){
-    return new RegExp("^" + words.join("|"));
-  };
+CodeMirror.defineMode("sass", config => {
+  var tokenRegexp = words => new RegExp("^" + words.join("|"));
 
   var tags = ["&", "a","abbr","acronym","address","applet","area","article","aside","audio","b","base","basefont","bdi","bdo","big","blockquote","body","br","button","canvas","caption","cite","code","col","colgroup","command","datalist","dd","del","details","dfn","dir","div","dl","dt","em","embed","fieldset","figcaption","figure","font","footer","form","frame","frameset","h1","h2","h3","h4","h5","h6","head","header","hgroup","hr","html","i","iframe","img","input","ins","keygen","kbd","label","legend","li","link","map","mark","menu","meta","meter","nav","noframes","noscript","object","ol","optgroup","option","output","p","param","pre","progress","q","rp","rt","ruby","s","samp","script","section","select","small","source","span","strike","strong","style","sub","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","title","tr","track","tt","u","ul","var","video","wbr"];
   var keywords = ["true", "false", "null", "auto"];
@@ -22,7 +20,7 @@ CodeMirror.defineMode("sass", function(config) {
   var pseudoElements = [':first-line', ':hover', ':first-letter', ':active', ':visited', ':before', ':after', ':link', ':focus', ':first-child', ':lang'];
   var pseudoElementsRegexp = new RegExp("^(" + pseudoElements.join("\\b|") + ")");
 
-  var urlTokens = function(stream, state){
+  var urlTokens = (stream, state) => {
     var ch = stream.peek();
 
     if (ch === ")"){
@@ -42,7 +40,7 @@ CodeMirror.defineMode("sass", function(config) {
       return "string";
     }
   };
-  var multilineComment = function(stream, state) {
+  var multilineComment = (stream, state) => {
     if (stream.skipTo("*/")){
       stream.next();
       stream.next();
@@ -54,7 +52,7 @@ CodeMirror.defineMode("sass", function(config) {
     return "comment";
   };
 
-  var buildStringTokenizer = function(quote, greedy){
+  var buildStringTokenizer = (quote, greedy) => {
     if(greedy == null){ greedy = true; }
 
     function stringTokenizer(stream, state){
@@ -87,19 +85,17 @@ CodeMirror.defineMode("sass", function(config) {
     return stringTokenizer;
   };
 
-  var buildInterpolationTokenizer = function(currentTokenizer){
-    return function(stream, state){
-      if (stream.peek() === "}"){
-        stream.next();
-        state.tokenizer = currentTokenizer;
-        return "operator";
-      }else{
-        return tokenBase(stream, state);
-      }
-    };
+  var buildInterpolationTokenizer = currentTokenizer => (stream, state) => {
+    if (stream.peek() === "}"){
+      stream.next();
+      state.tokenizer = currentTokenizer;
+      return "operator";
+    }else{
+      return tokenBase(stream, state);
+    }
   };
 
-  var indent = function(state){
+  var indent = state => {
     if (state.indentCount == 0){
       state.indentCount++;
       var lastScopeOffset = state.scopes[0].offset;
@@ -108,13 +104,13 @@ CodeMirror.defineMode("sass", function(config) {
     }
   };
 
-  var dedent = function(state){
+  var dedent = state => {
     if (state.scopes.length == 1) { return; }
 
     state.scopes.shift();
   };
 
-  var tokenBase = function(stream, state) {
+  var tokenBase = (stream, state) => {
     var ch = stream.peek();
 
     // Single line Comment
@@ -287,7 +283,7 @@ CodeMirror.defineMode("sass", function(config) {
     return 'error';
   };
 
-  var tokenLexer = function(stream, state) {
+  var tokenLexer = (stream, state) => {
     if (stream.sol()){
       state.indentCount = 0;
     }
@@ -324,7 +320,7 @@ CodeMirror.defineMode("sass", function(config) {
   };
 
   return {
-    startState: function() {
+    startState() {
       return {
         tokenizer: tokenBase,
         scopes: [{offset: 0, type: 'sass'}],
@@ -332,15 +328,15 @@ CodeMirror.defineMode("sass", function(config) {
         definedMixins: [],
       };
     },
-    token: function(stream, state) {
+    token(stream, state) {
       var style = tokenLexer(stream, state);
 
-      state.lastToken = { style: style, content: stream.current() };
+      state.lastToken = { style, content: stream.current() };
 
       return style;
     },
 
-    indent: function(state) {
+    indent(state) {
       return state.scopes[0].offset;
     }
   };

@@ -1,25 +1,25 @@
-CodeMirror.defineMode("gfm", function(config, parserConfig) {
+CodeMirror.defineMode("gfm", (config, parserConfig) => {
   var codeDepth = 0;
   function blankLine(state) {
     state.code = false;
     return null;
   }
   var gfmOverlay = {
-    startState: function() {
+    startState() {
       return {
         code: false,
         codeBlock: false,
         ateSpace: false
       };
     },
-    copyState: function(s) {
+    copyState(s) {
       return {
         code: s.code,
         codeBlock: s.codeBlock,
         ateSpace: s.ateSpace
       };
     },
-    token: function(stream, state) {
+    token(stream, state) {
       // Hack to prevent formatting override inside code blocks (block and inline)
       if (state.codeBlock) {
         if (stream.match(/^```/)) {
@@ -83,7 +83,7 @@ CodeMirror.defineMode("gfm", function(config, parserConfig) {
       stream.next();
       return null;
     },
-    blankLine: blankLine
+    blankLine
   };
   CodeMirror.defineMIME("gfmBase", {
     name: "markdown",

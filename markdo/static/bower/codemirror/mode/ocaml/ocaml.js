@@ -1,4 +1,4 @@
-CodeMirror.defineMode('ocaml', function(config) {
+CodeMirror.defineMode('ocaml', config => {
 
   var words = {
     'true': 'atom',
@@ -75,7 +75,9 @@ CodeMirror.defineMode('ocaml', function(config) {
   }
 
   function tokenString(stream, state) {
-    var next, end = false, escaped = false;
+    var next;
+    var end = false;
+    var escaped = false;
     while ((next = stream.next()) != null) {
       if (next === '"' && !escaped) {
         end = true;
@@ -90,7 +92,8 @@ CodeMirror.defineMode('ocaml', function(config) {
   };
 
   function tokenComment(stream, state) {
-    var prev, next;
+    var prev;
+    var next;
     while(state.commentLevel > 0 && (next = stream.next()) != null) {
       if (prev === '(' && next === '*') state.commentLevel++;
       if (prev === '*' && next === ')') state.commentLevel--;
@@ -103,8 +106,8 @@ CodeMirror.defineMode('ocaml', function(config) {
   }
 
   return {
-    startState: function() {return {tokenize: tokenBase, commentLevel: 0};},
-    token: function(stream, state) {
+    startState() {return {tokenize: tokenBase, commentLevel: 0};},
+    token(stream, state) {
       if (stream.eatSpace()) return null;
       return state.tokenize(stream, state);
     }

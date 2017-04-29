@@ -1,9 +1,9 @@
 
-(function() {
+((() => {
 
     CodeMirror.xmlHints = [];
 
-    CodeMirror.xmlHint = function(cm, simbol) {
+    CodeMirror.xmlHint = (cm, simbol) => {
 
         if(simbol.length > 0) {
             var cursor = cm.getCursor();
@@ -15,7 +15,7 @@
         CodeMirror.simpleHint(cm, getHint);
     };
 
-    var getHint = function(cm) {
+    var getHint = cm => {
 
         var cursor = cm.getCursor();
 
@@ -57,7 +57,7 @@
         };
     };
 
-    var getActiveElement = function(codeMirror, text) {
+    var getActiveElement = (codeMirror, text) => {
 
         var element = '';
 
@@ -101,7 +101,7 @@
         return element;
     };
 
-    var getOpenTag = function(text) {
+    var getOpenTag = text => {
 
         var open = text.lastIndexOf('<');
         var close = text.lastIndexOf('>');
@@ -128,4 +128,4 @@
         return '';
     };
 
-})();
+}))();

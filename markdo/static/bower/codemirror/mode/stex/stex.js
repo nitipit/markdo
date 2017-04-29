@@ -3,8 +3,7 @@
  * Licence: MIT
  */
 
-CodeMirror.defineMode("stex", function(cmCfg, modeCfg) 
-{    
+CodeMirror.defineMode("stex", (cmCfg, modeCfg) => {    
     function pushCommand(state, command) {
 	state.cmdState.push(command);
     }
@@ -52,7 +51,7 @@ CodeMirror.defineMode("stex", function(cmCfg, modeCfg)
 		this.bracketNo++;
 		return "bracket";
 	    };
-	    this.closeBracket = function(content) {
+	    this.closeBracket = content => {
 	    };
 	};
     }
@@ -69,11 +68,11 @@ CodeMirror.defineMode("stex", function(cmCfg, modeCfg)
 	this.name="DEFAULT";
 	this.style="tag";
 
-	this.styleIdentifier = function(content) {
+	this.styleIdentifier = content => {
 	};
-	this.openBracket = function(content) {
+	this.openBracket = content => {
 	};
-	this.closeBracket = function(content) {
+	this.closeBracket = content => {
 	};
     };
 
@@ -167,10 +166,10 @@ CodeMirror.defineMode("stex", function(cmCfg, modeCfg)
     }
 
     return {
-     startState: function() { return { f:normal, cmdState:[] }; },
-	 copyState: function(s) { return { f: s.f, cmdState: s.cmdState.slice(0, s.cmdState.length) }; },
+     startState() { return { f:normal, cmdState:[] }; },
+	 copyState(s) { return { f: s.f, cmdState: s.cmdState.slice(0, s.cmdState.length) }; },
 	 
-	 token: function(stream, state) {
+	 token(stream, state) {
 	 var t = state.f(stream, state);
 	 var w = stream.current();
 	 return t;

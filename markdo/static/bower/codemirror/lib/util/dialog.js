@@ -1,6 +1,6 @@
 // Open simple dialogs on top of an editor. Relies on dialog.css.
 
-(function() {
+((() => {
   function dialogDiv(cm, template, bottom) {
     var wrap = cm.getWrapperElement();
     var dialog;
@@ -16,15 +16,17 @@
 
   CodeMirror.defineExtension("openDialog", function(template, callback, options) {
     var dialog = dialogDiv(this, template, options && options.bottom);
-    var closed = false, me = this;
+    var closed = false;
+    var me = this;
     function close() {
       if (closed) return;
       closed = true;
       dialog.parentNode.removeChild(dialog);
     }
-    var inp = dialog.getElementsByTagName("input")[0], button;
+    var inp = dialog.getElementsByTagName("input")[0];
+    var button;
     if (inp) {
-      CodeMirror.connect(inp, "keydown", function(e) {
+      CodeMirror.connect(inp, "keydown", e => {
         if (e.keyCode == 13 || e.keyCode == 27) {
           CodeMirror.e_stop(e);
           close();
@@ -36,7 +38,7 @@
       inp.focus();
       CodeMirror.connect(inp, "blur", close);
     } else if (button = dialog.getElementsByTagName("button")[0]) {
-      CodeMirror.connect(button, "click", function() {
+      CodeMirror.connect(button, "click", () => {
         close();
         me.focus();
       });
@@ -49,7 +51,9 @@
   CodeMirror.defineExtension("openConfirm", function(template, callbacks, options) {
     var dialog = dialogDiv(this, template, options && options.bottom);
     var buttons = dialog.getElementsByTagName("button");
-    var closed = false, me = this, blurring = 1;
+    var closed = false;
+    var me = this;
+    var blurring = 1;
     function close() {
       if (closed) return;
       closed = true;
@@ -59,18 +63,18 @@
     buttons[0].focus();
     for (var i = 0; i < buttons.length; ++i) {
       var b = buttons[i];
-      (function(callback) {
-        CodeMirror.connect(b, "click", function(e) {
+      ((callback => {
+        CodeMirror.connect(b, "click", e => {
           CodeMirror.e_preventDefault(e);
           close();
           if (callback) callback(me);
         });
-      })(callbacks[i]);
-      CodeMirror.connect(b, "blur", function() {
+      }))(callbacks[i]);
+      CodeMirror.connect(b, "blur", () => {
         --blurring;
-        setTimeout(function() { if (blurring <= 0) close(); }, 200);
+        setTimeout(() => { if (blurring <= 0) close(); }, 200);
       });
-      CodeMirror.connect(b, "focus", function() { ++blurring; });
+      CodeMirror.connect(b, "focus", () => { ++blurring; });
     }
   });
-})();
+}))();

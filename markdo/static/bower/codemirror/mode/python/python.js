@@ -1,4 +1,4 @@
-CodeMirror.defineMode("python", function(conf, parserConf) {
+CodeMirror.defineMode("python", (conf, parserConf) => {
     var ERRORCLASS = 'error';
     
     function wordRegexp(words) {
@@ -207,7 +207,7 @@ CodeMirror.defineMode("python", function(conf, parserConf) {
         }
         state.scopes.unshift({
             offset: indentUnit,
-            type: type
+            type
         });
     }
     
@@ -303,7 +303,7 @@ CodeMirror.defineMode("python", function(conf, parserConf) {
     }
 
     var external = {
-        startState: function(basecolumn) {
+        startState(basecolumn) {
             return {
               tokenize: tokenBase,
               scopes: [{offset:basecolumn || 0, type:'py'}],
@@ -313,7 +313,7 @@ CodeMirror.defineMode("python", function(conf, parserConf) {
           };
         },
         
-        token: function(stream, state) {
+        token(stream, state) {
             var style = tokenLexer(stream, state);
             
             state.lastToken = style;
@@ -325,7 +325,7 @@ CodeMirror.defineMode("python", function(conf, parserConf) {
             return style;
         },
         
-        indent: function(state, textAfter) {
+        indent(state, textAfter) {
             if (state.tokenize != tokenBase) {
                 return state.tokenize.isString ? CodeMirror.Pass : 0;
             }

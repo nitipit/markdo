@@ -1,11 +1,13 @@
-(function() {
-  CodeMirror.commands.newlineAndIndentContinueMarkdownList = function(cm) {
-    var pos = cm.getCursor(), token = cm.getTokenAt(pos);
+((() => {
+  CodeMirror.commands.newlineAndIndentContinueMarkdownList = cm => {
+    var pos = cm.getCursor();
+    var token = cm.getTokenAt(pos);
     var mode = CodeMirror.innerMode(cm.getMode(), token.state).mode;
     var space;
     if (token.className == "string") {
       var full = cm.getRange({line: pos.line, ch: 0}, {line: pos.line, ch: token.end});
-      var listStart = /\*|\d+\./, listContinue;
+      var listStart = /\*|\d+\./;
+      var listContinue;
       if (token.string.search(listStart) == 0) {
         var reg = /^[\W]*(\d+)\./g;
         var matches = reg.exec(full);
@@ -26,4 +28,4 @@
     else
       cm.execCommand("newlineAndIndent");
   };
-})();
+}))();

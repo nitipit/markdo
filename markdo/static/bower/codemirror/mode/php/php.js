@@ -1,11 +1,12 @@
-(function() {
+((() => {
   function keywords(str) {
-    var obj = {}, words = str.split(" ");
+    var obj = {};
+    var words = str.split(" ");
     for (var i = 0; i < words.length; ++i) obj[words[i]] = true;
     return obj;
   }
   function heredoc(delim) {
-    return function(stream, state) {
+    return (stream, state) => {
       if (stream.match(delim)) state.tokenize = null;
       else stream.skipToEnd();
       return "string";
@@ -50,7 +51,7 @@
     }
   };
 
-  CodeMirror.defineMode("php", function(config, parserConfig) {
+  CodeMirror.defineMode("php", (config, parserConfig) => {
     var htmlMode = CodeMirror.getMode(config, "text/html");
     var phpMode = CodeMirror.getMode(config, phpConfig);
 
@@ -73,10 +74,11 @@
           var style = htmlMode.token(stream, state.curState);
         }
         state.pending = null;
-        var cur = stream.current(), openPHP = cur.search(/<\?/);
+        var cur = stream.current();
+        var openPHP = cur.search(/<\?/);
         if (openPHP != -1) {
           if (style == "string" && /\"$/.test(cur) && !/\?>/.test(cur)) state.pending = '"';
-          else state.pending = {end: stream.pos, style: style};
+          else state.pending = {end: stream.pos, style};
           stream.backUp(cur.length - openPHP);
         }
         return style;
@@ -90,18 +92,22 @@
     }
 
     return {
-      startState: function() {
-        var html = CodeMirror.startState(htmlMode), php = CodeMirror.startState(phpMode);
-        return {html: html,
-                php: php,
+      startState() {
+        var html = CodeMirror.startState(htmlMode);
+        var php = CodeMirror.startState(phpMode);
+        return {html,
+                php,
                 curMode: parserConfig.startOpen ? phpMode : htmlMode,
                 curState: parserConfig.startOpen ? php : html,
                 pending: null};
       },
 
-      copyState: function(state) {
-        var html = state.html, htmlNew = CodeMirror.copyState(htmlMode, html),
-            php = state.php, phpNew = CodeMirror.copyState(phpMode, php), cur;
+      copyState(state) {
+        var html = state.html;
+        var htmlNew = CodeMirror.copyState(htmlMode, html);
+        var php = state.php;
+        var phpNew = CodeMirror.copyState(phpMode, php);
+        var cur;
         if (state.curMode == htmlMode) cur = htmlNew;
         else cur = phpNew;
         return {html: htmlNew, php: phpNew, curMode: state.curMode, curState: cur,
@@ -110,7 +116,7 @@
 
       token: dispatch,
 
-      indent: function(state, textAfter) {
+      indent(state, textAfter) {
         if ((state.curMode != phpMode && /^\s*<\//.test(textAfter)) ||
             (state.curMode == phpMode && /^\?>/.test(textAfter)))
           return htmlMode.indent(state.html, textAfter);
@@ -119,11 +125,11 @@
 
       electricChars: "/{}:",
 
-      innerMode: function(state) { return {state: state.curState, mode: state.curMode}; }
+      innerMode(state) { return {state: state.curState, mode: state.curMode}; }
     };
   }, "htmlmixed");
 
   CodeMirror.defineMIME("application/x-httpd-php", "php");
   CodeMirror.defineMIME("application/x-httpd-php-open", {name: "php", startOpen: true});
   CodeMirror.defineMIME("text/x-php", phpConfig);
-})();
+}))();

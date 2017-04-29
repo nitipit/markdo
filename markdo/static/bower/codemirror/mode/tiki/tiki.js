@@ -1,6 +1,6 @@
-CodeMirror.defineMode('tiki', function(config, parserConfig) {
-	function inBlock(style, terminator, returnTokenizer) {
-		return function(stream, state) {
+CodeMirror.defineMode('tiki', (config, parserConfig) => {
+    function inBlock(style, terminator, returnTokenizer) {
+		return (stream, state) => {
 			while (!stream.eol()) {
 				if (stream.match(terminator)) {
 					state.tokenize = inText;
@@ -14,9 +14,9 @@ CodeMirror.defineMode('tiki', function(config, parserConfig) {
 			return style;
 		};
 	}
-	
-	function inLine(style, terminator) {
-		return function(stream, state) {
+
+    function inLine(style, terminator) {
+		return (stream, state) => {
 			while(!stream.eol()) {
 				stream.next();
 			}
@@ -24,8 +24,8 @@ CodeMirror.defineMode('tiki', function(config, parserConfig) {
 			return style;
 		};
 	}
-	
-	function inText(stream, state) {
+
+    function inText(stream, state) {
 		function chain(parser) {
 			state.tokenize = parser;
 			return parser(stream, state);
@@ -123,12 +123,14 @@ CodeMirror.defineMode('tiki', function(config, parserConfig) {
 		//stream.eatWhile(/[&{]/); was eating up plugins, turned off to act less like html and more like tiki
 		return null;
 	}
-	
-	var indentUnit = config.indentUnit;
 
-	// Return variables for tokenizers
-	var pluginName, type;
-	function inPlugin(stream, state) {
+    var indentUnit = config.indentUnit;
+
+    // Return variables for tokenizers
+    var pluginName;
+
+    var type;
+    function inPlugin(stream, state) {
 		var ch = stream.next();
 		var peek = stream.peek();
 		
@@ -162,8 +164,8 @@ CodeMirror.defineMode('tiki', function(config, parserConfig) {
 		}
 	}
 
-	function inAttribute(quote) {
-		return function(stream, state) {
+    function inAttribute(quote) {
+		return (stream, state) => {
 			while (!stream.eol()) {
 				if (stream.next() == quote) {
 					state.tokenize = inPlugin;
@@ -173,9 +175,9 @@ CodeMirror.defineMode('tiki', function(config, parserConfig) {
 			return "string";
 		};
 	}
-	
-	function inAttributeNoQuote() {
-		return function(stream, state) {
+
+    function inAttributeNoQuote() {
+		return (stream, state) => {
 			while (!stream.eol()) {
 				var ch = stream.next();
 				var peek = stream.peek();
@@ -188,32 +190,33 @@ CodeMirror.defineMode('tiki', function(config, parserConfig) {
 		};
 	}
 
-	var curState, setStyle;
-	function pass() {
-		for (var i = arguments.length - 1; i >= 0; i--) curState.cc.push(arguments[i]);
+    var curState;
+    var setStyle;
+    function pass(...args) {
+		for (var i = args.length - 1; i >= 0; i--) curState.cc.push(args[i]);
 	}
-	
-	function cont() {
-		pass.apply(null, arguments);
+
+    function cont(...args) {
+		pass(...args);
 		return true;
 	}
 
-	function pushContext(pluginName, startOfLine) {
+    function pushContext(pluginName, startOfLine) {
 		var noIndent = curState.context && curState.context.noIndent;
 		curState.context = {
 			prev: curState.context,
-			pluginName: pluginName,
+			pluginName,
 			indent: curState.indented,
-			startOfLine: startOfLine,
-			noIndent: noIndent
+			startOfLine,
+			noIndent
 		};
 	}
-	
-	function popContext() {
+
+    function popContext() {
 		if (curState.context) curState.context = curState.context.prev;
 	}
 
-	function element(type) {
+    function element(type) {
 		if (type == "openPlugin") {curState.pluginName = pluginName; return cont(attributes, endplugin(curState.startOfLine));}
 		else if (type == "closePlugin") {
 			var err = false;
@@ -233,9 +236,9 @@ CodeMirror.defineMode('tiki', function(config, parserConfig) {
 		}
 		else return cont();
 	}
-	
-	function endplugin(startOfLine) {
-		return function(type) {
+
+    function endplugin(startOfLine) {
+		return type => {
 			if (
 			type == "selfclosePlugin" ||
 			type == "endPlugin"
@@ -245,34 +248,34 @@ CodeMirror.defineMode('tiki', function(config, parserConfig) {
 			return cont();
 		};
 	}
-	
-	function endcloseplugin(err) {
-		return function(type) {
+
+    function endcloseplugin(err) {
+		return type => {
 			if (err) setStyle = "error";
 			if (type == "endPlugin") return cont();
 			return pass();
 		};
 	}
 
-	function attributes(type) {
+    function attributes(type) {
 		if (type == "keyword") {setStyle = "attribute"; return cont(attributes);}
 		if (type == "equals") return cont(attvalue, attributes);
 		return pass();
 	}
-	function attvalue(type) {
+    function attvalue(type) {
 		if (type == "keyword") {setStyle = "string"; return cont();}
 		if (type == "string") return cont(attvaluemaybe);
 			return pass();
 	}
-	function attvaluemaybe(type) {
+    function attvaluemaybe(type) {
 		if (type == "string") return cont(attvaluemaybe);
 		else return pass();
 	}
-	return {
-		startState: function() {
+    return {
+		startState() {
 			return {tokenize: inText, cc: [], indented: 0, startOfLine: true, pluginName: null, context: null};
 		},
-		token: function(stream, state) {
+		token(stream, state) {
 			if (stream.sol()) {
 				state.startOfLine = true;
 				state.indented = stream.indentation();
@@ -291,7 +294,7 @@ CodeMirror.defineMode('tiki', function(config, parserConfig) {
 			state.startOfLine = false;
 			return setStyle || style;
 				},
-		indent: function(state, textAfter) {
+		indent(state, textAfter) {
 			var context = state.context;
 			if (context && context.noIndent) return 0;
 			if (context && /^{\//.test(textAfter))

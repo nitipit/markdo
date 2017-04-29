@@ -1,4 +1,4 @@
-CodeMirror.defineMode('smalltalk', function(config, modeConfig) {
+CodeMirror.defineMode('smalltalk', (config, modeConfig) => {
 
 	var specialChars = /[+\-/\\*~<>=@%|&?!.:;^]/;
 	var keywords = /true|false|nil|self|super|thisContext/;
@@ -25,7 +25,7 @@ CodeMirror.defineMode('smalltalk', function(config, modeConfig) {
 		this.userIndentationDelta = indentation > 0 ? (indentation / config.indentUnit - this.indentation) : 0;
 	};
 
-	var next = function(stream, context, state) {
+	var next = (stream, context, state) => {
 		var token = new Token(null, context, false);
 		var aChar = stream.next();
 
@@ -76,17 +76,17 @@ CodeMirror.defineMode('smalltalk', function(config, modeConfig) {
 		return token;
 	};
 
-	var nextComment = function(stream, context) {
+	var nextComment = (stream, context) => {
 		stream.eatWhile(/[^"]/);
 		return new Token('comment', stream.eat('"') ? context.parent : context, true);
 	};
 
-	var nextString = function(stream, context) {
+	var nextString = (stream, context) => {
 		stream.eatWhile(/[^']/);
 		return new Token('string', stream.eat('\'') ? context.parent : context, false);
 	};
 
-	var nextTemporaries = function(stream, context, state) {
+	var nextTemporaries = (stream, context, state) => {
 		var token = new Token(null, context, false);
 		var aChar = stream.next();
 
@@ -103,11 +103,11 @@ CodeMirror.defineMode('smalltalk', function(config, modeConfig) {
 	};
 
 	return {
-		startState: function() {
+		startState() {
 			return new State;
 		},
 
-		token: function(stream, state) {
+		token(stream, state) {
 			state.userIndent(stream.indentation());
 
 			if (stream.eatSpace()) {
@@ -122,11 +122,11 @@ CodeMirror.defineMode('smalltalk', function(config, modeConfig) {
 			return token.name;
 		},
 
-		blankLine: function(state) {
+		blankLine(state) {
 			state.userIndent(0);
 		},
 
-		indent: function(state, textAfter) {
+		indent(state, textAfter) {
 			var i = state.context.next === next && textAfter && textAfter.charAt(0) === ']' ? -1 : state.userIndentationDelta;
 			return (state.indentation + i) * config.indentUnit;
 		},
